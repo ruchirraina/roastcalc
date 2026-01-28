@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roastcalc/button_grid.dart';
 import 'package:roastcalc/theme_extension.dart';
 
 class Home extends StatelessWidget {
@@ -26,7 +27,16 @@ class Home extends StatelessWidget {
           //TODO: implement - calculator grid (first visual then working)
           Expanded(
             flex: 5,
-            child: Container(color: context.colorScheme.primary),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // box width that holds circular button with padding
+                final double boxWidth = constraints.maxWidth / 4;
+                // box height that holds circular button with padding
+                final double boxHeight = constraints.maxHeight / 5;
+
+                return ButtonGrid(boxWidth: boxWidth, boxHeight: boxHeight);
+              },
+            ),
           ),
         ],
       ),
