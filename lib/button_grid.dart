@@ -68,8 +68,27 @@ class ButtonGrid extends StatelessWidget {
                   child: Padding(
                     // padding around filled button
                     padding: .all(4),
-                    // AC and % button
-                    child: (i == 0 && (j == 0 || j == 2))
+                    // AC button
+                    child: (i == 0 && j == 0)
+                        ? FilledButton(
+                            style: FilledButton.styleFrom(
+                              // circular
+                              shape: const CircleBorder(),
+                              backgroundColor:
+                                  context.colorScheme.errorContainer, // red
+                            ),
+                            onPressed: () {}, // non functional
+                            child: Text(
+                              _buttonLabels[0],
+                              // appropriate style for AC button
+                              style: context.textTheme.headlineMedium!.copyWith(
+                                color: context.colorScheme.onErrorContainer,
+                                fontWeight: .bold,
+                              ),
+                            ),
+                          )
+                        // numbers
+                        : (i == 0 && j == 2)
                         ? FilledButton.tonal(
                             style: FilledButton.styleFrom(
                               // circular
@@ -77,19 +96,13 @@ class ButtonGrid extends StatelessWidget {
                             ),
                             onPressed: () {}, // non functional
                             child: Text(
-                              _buttonLabels[j],
-                              style:
-                                  (j == 0) // appropriate style for AC button
-                                  ? context.textTheme.headlineSmall!.copyWith(
-                                      fontWeight: .bold,
-                                    )
-                                  // appropriate style for % button
-                                  : context.textTheme.displaySmall!.copyWith(
-                                      fontWeight: .bold,
-                                    ),
+                              _buttonLabels[2],
+                              // appropriate style for % button
+                              style: context.textTheme.headlineLarge!.copyWith(
+                                fontWeight: .bold,
+                              ),
                             ),
                           )
-                        // numbers
                         : ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               // circular
@@ -163,7 +176,7 @@ class ButtonGrid extends StatelessWidget {
                             child: Text(
                               _buttonLabels[4 * (i + 1) - 1],
                               // appropriate size and style for operators
-                              style: context.textTheme.displaySmall!.copyWith(
+                              style: context.textTheme.displayMedium!.copyWith(
                                 fontWeight: .bold,
                               ),
                             ),
@@ -197,7 +210,7 @@ class ButtonGrid extends StatelessWidget {
                 onPressed: () {}, // non functional rn
                 child: Icon(
                   Icons.backspace_outlined,
-                  size: 28, // appropriate size
+                  size: 32, // appropriate size
                   applyTextScaling: true, // so it doesn't look tiny if font big
                 ),
               ),
