@@ -1,7 +1,7 @@
 name: roastcalc
 description: "Do math, get roasted"
 publish_to: 'none'
-version: 0.3.0
+version: 0.3.2
 
 environment:
   sdk: ^3.10.7
