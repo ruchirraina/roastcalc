@@ -1,7 +1,7 @@
 name: roastcalc
 description: "Do math, get roasted"
 publish_to: 'none'
-version: 0.2.5
+version: 0.3.0
 
 environment:
   sdk: ^3.10.7
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +18,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: JetBrainsMono
+      fonts:
+        - asset: lib/assets/JetBrainsMono.ttf

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:roastcalc/button_grid.dart';
 import 'package:roastcalc/theme_extension.dart';
+import 'package:roastcalc/info_popup.dart';
+import 'package:roastcalc/button_grid.dart';
+import 'package:roastcalc/history_panel.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,26 +12,33 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // controls if history slide panel visibile or not and grid layout
+  // holds history panel visibility info and controls grid layout
   bool _panelOpen = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // history Button - rn trigger grid animation and slides panel but empty
-        // TODO: implement scrollable list that shows history of calculations
+        // history button - rn trigger grid changes and slides history panel
         leading: IconButton(
           onPressed: () {
             setState(() {
               _panelOpen = !_panelOpen;
             });
           },
-          icon: Icon(Icons.history),
+          // basic anim switch between history and close icon
+          icon: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _panelOpen ? Icon(Icons.close) : Icon(Icons.history),
+          ),
         ),
         // info about app and me
-        // TODO: implement popup that displays app version and my tech socials
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.info_outline))],
+        actions: [
+          IconButton(
+            onPressed: () => showInfoPopUp(context),
+            icon: Icon(Icons.info_outline),
+          ),
+        ],
       ),
 
       // nav buttons in some androids overlay so safe area
@@ -73,7 +82,7 @@ class _HomeState extends State<Home> {
                         duration: const Duration(milliseconds: 300),
                         // approrpriate curve
                         curve: Curves.fastOutSlowIn,
-                        child: Card(),
+                        child: HistoryPanel(),
                       ),
                     ],
                   );
