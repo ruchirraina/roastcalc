@@ -29,17 +29,17 @@ void showInfoPopUp(BuildContext context) {
               ),
             ),
             // small text for version info
-            Text('v0.3.0', style: context.textTheme.labelSmall),
+            Text('v0.3.5', style: context.textTheme.labelSmall),
           ],
         ),
         content: Wrap(
           children: [
-            Text('Made with 🤍.Check out my '),
+            Text('Made with 🤍. Check out my: '),
             // when tapped trigger going to my github through device browser
             GestureDetector(
               onTap: () => _launchURL(), // handler function
               child: Text(
-                'Github.',
+                'Github',
                 style: context.textTheme.bodyMedium!.copyWith(
                   fontWeight: .bold, // emphasize
                   color: context.colorScheme.primary, // highlight

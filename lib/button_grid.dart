@@ -67,7 +67,7 @@ class ButtonGrid extends StatelessWidget {
                   curve: Curves.linear,
                   child: Padding(
                     // padding around filled button
-                    padding: .all(4),
+                    padding: const .all(4),
                     // AC button
                     child: (i == 0 && j == 0)
                         ? FilledButton(
@@ -87,7 +87,7 @@ class ButtonGrid extends StatelessWidget {
                               ),
                             ),
                           )
-                        // numbers
+                        // % operator
                         : (i == 0 && j == 2)
                         ? FilledButton.tonal(
                             style: FilledButton.styleFrom(
@@ -103,6 +103,7 @@ class ButtonGrid extends StatelessWidget {
                               ),
                             ),
                           )
+                        // numbers
                         : ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               // circular
@@ -148,7 +149,7 @@ class ButtonGrid extends StatelessWidget {
                   width: boxWidth,
                   child: Padding(
                     // padding around filled button
-                    padding: .all(4),
+                    padding: const .all(4),
                     child: (i == 4)
                         // filled to emphasize equal to button
                         ? FilledButton(
@@ -203,12 +204,12 @@ class ButtonGrid extends StatelessWidget {
             width: boxWidth,
             child: Padding(
               // padding around filled button
-              padding: .all(4),
+              padding: const .all(4),
               child: FilledButton.tonal(
                 // circular
                 style: FilledButton.styleFrom(shape: const CircleBorder()),
                 onPressed: () {}, // non functional rn
-                child: Icon(
+                child: const Icon(
                   Icons.backspace_outlined,
                   size: 32, // appropriate size
                   applyTextScaling: true, // so it doesn't look tiny if font big
