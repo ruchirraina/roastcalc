@@ -10,12 +10,15 @@ class ButtonGrid extends StatelessWidget {
   // boolean value for history panel open
   final bool panelOpen;
 
+  final void Function(String) onButtonPress;
+
   // recieving box parameters
   ButtonGrid({
     required this.boxWidth,
     required this.boxHeight,
     required this.boxHeightShrink,
     required this.panelOpen,
+    required this.onButtonPress,
     super.key,
   });
 
@@ -77,7 +80,9 @@ class ButtonGrid extends StatelessWidget {
                               backgroundColor:
                                   context.colorScheme.errorContainer, // red
                             ),
-                            onPressed: () {}, // non functional
+                            onPressed: () => onButtonPress(
+                              _buttonLabels[0],
+                            ), // non functional
                             child: Text(
                               _buttonLabels[0],
                               // appropriate style for AC button
@@ -94,7 +99,9 @@ class ButtonGrid extends StatelessWidget {
                               // circular
                               shape: const CircleBorder(),
                             ),
-                            onPressed: () {}, // non functional
+                            onPressed: () => onButtonPress(
+                              _buttonLabels[2],
+                            ), // non functional
                             child: Text(
                               _buttonLabels[2],
                               // appropriate style for % button
@@ -109,7 +116,9 @@ class ButtonGrid extends StatelessWidget {
                               // circular
                               shape: const CircleBorder(),
                             ),
-                            onPressed: () {}, // non functional
+                            onPressed: () => onButtonPress(
+                              _buttonLabels[4 * i + j],
+                            ), // non functional
                             child: Text(
                               _buttonLabels[4 * i + j],
                               // appropriate style for numbers
@@ -173,7 +182,9 @@ class ButtonGrid extends StatelessWidget {
                             style: FilledButton.styleFrom(
                               shape: const CircleBorder(),
                             ),
-                            onPressed: () {}, // non functional rn
+                            onPressed: () => onButtonPress(
+                              _buttonLabels[4 * (i + 1) - 1],
+                            ), // non functional rn
                             child: Text(
                               _buttonLabels[4 * (i + 1) - 1],
                               // appropriate size and style for operators
@@ -208,7 +219,8 @@ class ButtonGrid extends StatelessWidget {
               child: FilledButton.tonal(
                 // circular
                 style: FilledButton.styleFrom(shape: const CircleBorder()),
-                onPressed: () {}, // non functional rn
+                onPressed: () =>
+                    onButtonPress(_buttonLabels[1]), // non functional rn
                 child: const Icon(
                   Icons.backspace_outlined,
                   size: 32, // appropriate size

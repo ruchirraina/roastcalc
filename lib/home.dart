@@ -16,9 +16,140 @@ class _HomeState extends State<Home> {
   // holds history panel visibility info and controls grid layout
   bool _panelOpen = false;
 
+  // entire expression is divided into list of chunks - format example: '67+'
+  // initially one empty '' chunk
+  List<String> _expression = [''];
+  // current focussed chunk index - initially first(0)
+  int _focussedChunk = 0;
+
+  void _onButtonPress(String input) {
+    // clear expression - back to just one chunk '' and focussed index - 0
+    if (input == 'AC') {
+      setState(() {
+        _expression = [''];
+        _focussedChunk = 0;
+      });
+      return;
+    }
+
+    // current chunk
+    String currentChunk = _expression[_focussedChunk];
+
+    // backspace logic
+    if (input == 'DEL') {
+      // if empty - don't allow
+      if (currentChunk.isEmpty) return;
+
+      setState(() {
+        // remove last character
+        _expression[_focussedChunk] = currentChunk.substring(
+          0,
+          currentChunk.length - 1,
+        );
+        // if now chunk empty - remove it - shift focus previous chunk if !last
+        if (_expression.length > 1 &&
+            currentChunk.substring(0, currentChunk.length - 1) == '') {
+          _expression.removeAt(_focussedChunk);
+          _focussedChunk--;
+        }
+      });
+      return;
+    }
+
+    final bool currentChunkEndsWithOperator =
+        (currentChunk.endsWith('%') ||
+        currentChunk.endsWith('÷') ||
+        currentChunk.endsWith('×') ||
+        currentChunk.endsWith('−') ||
+        currentChunk.endsWith('+'));
+
+    final bool isInputNumberOrDecimal =
+        (num.tryParse(input) != null || input == '00' || input == '.');
+
+    // new chunk creation
+    if (currentChunkEndsWithOperator && isInputNumberOrDecimal) {
+      // conver 00 to 0 if new chunk empty
+      if (input == '00') input = '0';
+      // conver . to 0. if new chunk empty
+      if (input == '.') input = '0.';
+
+      // move focus to new chunk and insert input there
+      _focussedChunk++;
+      setState(() {
+        // in bewteen
+        if (_focussedChunk < _expression.length) {
+          _expression.insert(_focussedChunk, input);
+          // at end
+        } else {
+          _expression.add(input);
+        }
+      });
+      return;
+    }
+
+    final bool isInputOperator =
+        (input == '%' ||
+        input == '÷' ||
+        input == '×' ||
+        input == '−' ||
+        input == '+');
+
+    final bool isInputOperatorExceptMinus =
+        (input == '%' || input == '÷' || input == '×' || input == '+');
+
+    // validaton for chunk
+
+    if (currentChunk.isEmpty) {
+      // conver 00 to 0 if chunk empty
+      if (input == '00') input = '0';
+      // conver . to 0. if chunk empty
+      if (input == '.') input = '0.';
+      // not allow any operator except − if chunk empty
+      if (isInputOperatorExceptMinus) return;
+      /* handle trailing zeroes at start - not allow
+       * not allow futher 0 or 00
+       * if other num input whether just 0 or -0 it becomes num or -num
+       * if not num input . or operators allowed */
+    } else if ((currentChunk == '0' || currentChunk == '−0') &&
+        !(input == '.' || isInputOperator)) {
+      if (input != '00' && input != '0') {
+        setState(() {
+          _expression[_focussedChunk] = (currentChunk == '-0')
+              ? '−$input'
+              : input;
+        });
+      }
+      return;
+      // only one . in a chunk
+    } else if (input == '.' && currentChunk.contains('.')) {
+      return;
+      // don't allow operator if end at decimal
+    } else if (isInputOperator &&
+        currentChunk[currentChunk.length - 1] == '.') {
+      return;
+      // if ends with operator and operator input - replace it with input
+    } else if (isInputOperator && currentChunkEndsWithOperator) {
+      // exception if just −
+      if (currentChunk == '−') return;
+      setState(() {
+        _expression[_focussedChunk] =
+            currentChunk.substring(0, currentChunk.length - 1) + input;
+      });
+      return;
+    }
+
+    // write input
+    setState(() {
+      _expression[_focussedChunk] = currentChunk + input;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // keyboard won't pop up but i dont want it resizing the screen anyways
+      resizeToAvoidBottomInset: false,
+
       appBar: AppBar(
         // history button - rn trigger grid changes and slides history panel
         leading: IconButton(
@@ -46,11 +177,21 @@ class _HomeState extends State<Home> {
       body: SafeArea(
         child: Column(
           children: [
-            // TODO: implement - display area
-            Expanded(flex: 15, child: DisplayArea()),
+            Expanded(
+              flex: 15,
+              // expression and answer
+              child: DisplayArea(
+                expression: _expression,
+                focussedChunk: _focussedChunk,
+                onChunkTap: (int focusOnChunk) {
+                  setState(() {
+                    _focussedChunk = focusOnChunk;
+                  });
+                },
+              ),
+            ),
             // TODO: implement - roast area
             Expanded(flex: 20, child: RoastArea()),
-            //TODO: implement - calculator grid - rn animated but non functional
             Expanded(
               flex: 65,
               child: Padding(
@@ -73,6 +214,7 @@ class _HomeState extends State<Home> {
                           boxHeight: boxHeight,
                           boxHeightShrink: boxHeightShrink,
                           panelOpen: _panelOpen,
+                          onButtonPress: _onButtonPress,
                         ),
                         // top
                         AnimatedPositioned(

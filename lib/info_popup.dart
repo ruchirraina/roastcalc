@@ -6,7 +6,7 @@ import 'package:roastcalc/theme_extension.dart';
 final Uri _url = Uri.parse('https://github.com/ruchirraina');
 
 // trigger going to my github through device browser
-Future<void> _launchURL() async {
+Future<void> _launchGithub() async {
   if (!await launchUrl(_url)) return;
 }
 
@@ -29,7 +29,7 @@ void showInfoPopUp(BuildContext context) {
               ),
             ),
             // small text for version info
-            Text('v0.3.5', style: context.textTheme.labelSmall),
+            Text('v0.6.5', style: context.textTheme.labelSmall),
           ],
         ),
         content: Wrap(
@@ -37,7 +37,7 @@ void showInfoPopUp(BuildContext context) {
             Text('Made with 🤍. Check out my: '),
             // when tapped trigger going to my github through device browser
             GestureDetector(
-              onTap: () => _launchURL(), // handler function
+              onTap: () => _launchGithub(), // handler function
               child: Text(
                 'Github',
                 style: context.textTheme.bodyMedium!.copyWith(
