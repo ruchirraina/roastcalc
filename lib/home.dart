@@ -210,14 +210,14 @@ class _HomeState extends State<Home> {
     String sanitizedExpression = expression
         .replaceAll('×', '*')
         .replaceAll('−', '-')
-        .replaceAll('÷', '/');
+        .replaceAll('÷', '/')
+        .replaceAll('%', '*0.01*');
 
     final bool expressionEndsWithOperator =
         (sanitizedExpression.endsWith('+') ||
         sanitizedExpression.endsWith('-') ||
         sanitizedExpression.endsWith('*') ||
-        sanitizedExpression.endsWith('/') ||
-        sanitizedExpression.endsWith('%'));
+        sanitizedExpression.endsWith('/'));
 
     if (expressionEndsWithOperator) {
       sanitizedExpression = sanitizedExpression.substring(

@@ -29,7 +29,7 @@ void showInfoPopUp(BuildContext context) {
               ),
             ),
             // small text for version info
-            Text('v0.7.1', style: context.textTheme.labelSmall),
+            Text('v0.7.2', style: context.textTheme.labelSmall),
           ],
         ),
         content: Wrap(
