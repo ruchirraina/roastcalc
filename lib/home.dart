@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart' hide Stack;
 import 'package:roastcalc/info_popup.dart';
 import 'package:roastcalc/display_area.dart';
 import 'package:roastcalc/roast_area.dart';
@@ -22,12 +23,29 @@ class _HomeState extends State<Home> {
   // current focussed chunk index - initially first(0)
   int _focussedChunk = 0;
 
+  String _answer = '';
+
   void _onButtonPress(String input) {
+    if (input == '=') {
+      if (_answer == '∞' || _answer == '−∞' || _answer == 'Indeterminate') {
+        return;
+      }
+      setState(() {
+        if (_answer.isNotEmpty) {
+          _expression = [_answer]; // new expression is just the answer chunk
+        }
+        _focussedChunk = 0; // focus on that chunk
+        _answer = ''; // clear answer until next expression change
+      });
+      return;
+    }
+
     // clear expression - back to just one chunk '' and focussed index - 0
     if (input == 'AC') {
       setState(() {
         _expression = [''];
         _focussedChunk = 0;
+        _answer = '';
       });
       return;
     }
@@ -52,6 +70,7 @@ class _HomeState extends State<Home> {
           _expression.removeAt(_focussedChunk);
           _focussedChunk--;
         }
+        _updateAnswer();
       });
       return;
     }
@@ -83,6 +102,7 @@ class _HomeState extends State<Home> {
         } else {
           _expression.add(input);
         }
+        _updateAnswer();
       });
       return;
     }
@@ -117,6 +137,7 @@ class _HomeState extends State<Home> {
           _expression[_focussedChunk] = (currentChunk == '-0')
               ? '−$input'
               : input;
+          _updateAnswer();
         });
       }
       return;
@@ -134,6 +155,7 @@ class _HomeState extends State<Home> {
       setState(() {
         _expression[_focussedChunk] =
             currentChunk.substring(0, currentChunk.length - 1) + input;
+        _updateAnswer();
       });
       return;
     }
@@ -141,7 +163,76 @@ class _HomeState extends State<Home> {
     // write input
     setState(() {
       _expression[_focussedChunk] = currentChunk + input;
+      _updateAnswer();
     });
+  }
+
+  void _updateAnswer() {
+    // evaluate expression and update answer every time expression changes
+    // except when just one chunk as that is not really an expression
+    if (_expression.length > 1) {
+      setState(() {
+        _answer = _expressionEvaluator(_expression.join());
+      });
+    } else {
+      setState(() {
+        _answer = '';
+      });
+    }
+  }
+
+  // evaluate expression and return answer as string
+  String _expressionEvaluator(String expression) {
+    // sanitize expression - replace × with *, − with -, ÷ with /
+    String sanitizedExpression = expression
+        .replaceAll('×', '*')
+        .replaceAll('−', '-')
+        .replaceAll('÷', '/');
+
+    final bool expressionEndsWithOperator =
+        (sanitizedExpression.endsWith('+') ||
+        sanitizedExpression.endsWith('-') ||
+        sanitizedExpression.endsWith('*') ||
+        sanitizedExpression.endsWith('/') ||
+        sanitizedExpression.endsWith('%'));
+
+    if (expressionEndsWithOperator) {
+      sanitizedExpression = sanitizedExpression.substring(
+        0,
+        sanitizedExpression.length - 1,
+      );
+    }
+
+    try {
+      // create parser
+      ExpressionParser parser = GrammarParser();
+
+      // create parsed expression using parser
+      Expression parsedExpression = parser.parse(sanitizedExpression);
+
+      // create context model - not really needed but required by evaluator
+      ContextModel cm = ContextModel();
+
+      // create evaluator
+      ExpressionEvaluator evaluator = RealEvaluator(cm);
+
+      // evaluate expression and return result as string
+      String result = evaluator.evaluate(parsedExpression).toString();
+
+      // if ends with .0 remove it
+      if (result.endsWith('.0')) {
+        result = result.substring(0, result.length - 2);
+      } else if (result == 'Infinity') {
+        result = '∞';
+      } else if (result == '-Infinity') {
+        result = '−∞';
+      } else if (result == 'NaN') {
+        result = 'Indeterminate';
+      }
+      return result;
+    } catch (e) {
+      return '';
+    }
   }
 
   @override
@@ -188,6 +279,7 @@ class _HomeState extends State<Home> {
                     _focussedChunk = focusOnChunk;
                   });
                 },
+                answer: _answer,
               ),
             ),
             // TODO: implement - roast area

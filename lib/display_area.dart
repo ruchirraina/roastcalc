@@ -9,11 +9,14 @@ class DisplayArea extends StatelessWidget {
   final int focussedChunk;
   // recieve fucntion - what to do when user taps a specific chunk
   final void Function(int) onChunkTap;
+  //reieve answer
+  final String answer;
 
   const DisplayArea({
     required this.expression,
     required this.focussedChunk,
     required this.onChunkTap,
+    required this.answer,
     super.key,
   });
 
@@ -58,8 +61,15 @@ class DisplayArea extends StatelessWidget {
               ),
             ),
           ),
-          // TODO: need to implement answer calculation logic
-          Text('answer', style: context.textTheme.headlineMedium),
+          Text(
+            answer,
+            style:
+                !(answer == '∞' || answer == '−∞' || answer == 'Indeterminate')
+                ? context.textTheme.headlineMedium
+                : context.textTheme.headlineMedium!.copyWith(
+                    color: context.colorScheme.error,
+                  ),
+          ),
         ],
       ),
     );
