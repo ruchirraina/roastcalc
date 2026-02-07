@@ -30,7 +30,7 @@ class DisplayArea extends StatelessWidget {
         crossAxisAlignment: .end,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             // need constrained height or listview crashes app
             child: SizedBox(
               height: 64,

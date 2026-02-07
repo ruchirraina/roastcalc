@@ -53,28 +53,6 @@ class _HomeState extends State<Home> {
     // current chunk
     String currentChunk = _expression[_focussedChunk];
 
-    // backspace logic
-    if (input == 'DEL') {
-      // if empty - don't allow
-      if (currentChunk.isEmpty) return;
-
-      setState(() {
-        // remove last character
-        _expression[_focussedChunk] = currentChunk.substring(
-          0,
-          currentChunk.length - 1,
-        );
-        // if now chunk empty - remove it - shift focus previous chunk if !last
-        if (_expression.length > 1 &&
-            currentChunk.substring(0, currentChunk.length - 1) == '') {
-          _expression.removeAt(_focussedChunk);
-          _focussedChunk--;
-        }
-        _updateAnswer();
-      });
-      return;
-    }
-
     final bool currentChunkEndsWithOperator =
         (currentChunk.endsWith('%') ||
         currentChunk.endsWith('÷') ||
@@ -82,11 +60,56 @@ class _HomeState extends State<Home> {
         currentChunk.endsWith('−') ||
         currentChunk.endsWith('+'));
 
+    // backspace logic
+    if (input == 'DEL') {
+      // if empty - don't allow
+      if (currentChunk.isEmpty) return;
+
+      setState(() {
+        // remove last character if one chunk or at last chunk
+        if (_expression.length == 1 ||
+            _focussedChunk == _expression.length - 1 ||
+            !currentChunkEndsWithOperator) {
+          _expression[_focussedChunk] = currentChunk.substring(
+            0,
+            currentChunk.length - 1,
+          );
+          // if now chunk empty - remove it - shift focus previous chunk if !last
+          // exception: remain first if removing first chunk and chunks was > 1
+          if (_expression.length > 1 &&
+              currentChunk.substring(0, currentChunk.length - 1) == '') {
+            _expression.removeAt(_focussedChunk);
+            if (_focussedChunk != 0) _focussedChunk--;
+          }
+          _updateAnswer();
+          // if chunk in between or start and chunk ends with operator
+          // remove operator at end of chunk
+          // join it with next chunk and remove this chunk - shift focus to it
+        } else {
+          // handle case of two decimals in a row -
+          // if current chunk and next chunk have decimals and remove later's .
+          final String nextChunkWithNoDecimals =
+              (currentChunk.contains('.') &&
+                  _expression[_focussedChunk + 1].contains('.'))
+              ? _expression[_focussedChunk + 1].replaceAll('.', '')
+              : _expression[_focussedChunk + 1];
+          _expression[_focussedChunk + 1] =
+              currentChunk.substring(0, currentChunk.length - 1) +
+              nextChunkWithNoDecimals;
+          _expression.removeAt(_focussedChunk);
+          _updateAnswer();
+        }
+      });
+      return;
+    }
+
     final bool isInputNumberOrDecimal =
         (num.tryParse(input) != null || input == '00' || input == '.');
 
     // new chunk creation
-    if (currentChunkEndsWithOperator && isInputNumberOrDecimal) {
+    if (currentChunkEndsWithOperator &&
+        currentChunk != '−' &&
+        isInputNumberOrDecimal) {
       // conver 00 to 0 if new chunk empty
       if (input == '00') input = '0';
       // conver . to 0. if new chunk empty
