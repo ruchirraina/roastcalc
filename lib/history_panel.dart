@@ -6,19 +6,20 @@ class HistoryPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: context.colorScheme.surface,
+        borderRadius: .circular(8),
+      ),
       child: Column(
         children: [
           // TODO: Implement Scrollable list of past calculations
           Expanded(flex: 9, child: SizedBox()),
-          ColoredBox(
-            color: context.colorScheme.primary,
-            child: SizedBox(height: 1, width: .infinity),
-          ),
+          Divider(height: 8, thickness: 2),
           // clear History Button
           Expanded(
             flex: 1,
-            child: TextButton.icon(
+            child: ElevatedButton.icon(
               onPressed: () {}, // non functional
               icon: Icon(Icons.delete, color: context.colorScheme.error), //red
               label: Text(

@@ -27,7 +27,10 @@ class _HomeState extends State<Home> {
 
   void _onButtonPress(String input) {
     if (input == '=') {
-      if (_answer == '∞' || _answer == '−∞' || _answer == 'Indeterminate') {
+      // not allow further operation just limit to answer display
+      if (_answer == 'Infinity' ||
+          _answer == '−Infinity' ||
+          _answer == 'Indeterminate') {
         return;
       }
       setState(() {
@@ -68,8 +71,7 @@ class _HomeState extends State<Home> {
       setState(() {
         // remove last character if one chunk or at last chunk
         if (_expression.length == 1 ||
-            _focussedChunk == _expression.length - 1 ||
-            !currentChunkEndsWithOperator) {
+            _focussedChunk == _expression.length - 1) {
           _expression[_focussedChunk] = currentChunk.substring(
             0,
             currentChunk.length - 1,
@@ -193,7 +195,7 @@ class _HomeState extends State<Home> {
   void _updateAnswer() {
     // evaluate expression and update answer every time expression changes
     // except when just one chunk as that is not really an expression
-    if (_expression.length > 1) {
+    if (_expression.length > 1 || _expression[_focussedChunk].endsWith('%')) {
       setState(() {
         _answer = _expressionEvaluator(_expression.join());
       });
@@ -245,10 +247,6 @@ class _HomeState extends State<Home> {
       // if ends with .0 remove it
       if (result.endsWith('.0')) {
         result = result.substring(0, result.length - 2);
-      } else if (result == 'Infinity') {
-        result = '∞';
-      } else if (result == '-Infinity') {
-        result = '−∞';
       } else if (result == 'NaN') {
         result = 'Indeterminate';
       }
@@ -291,18 +289,31 @@ class _HomeState extends State<Home> {
       body: SafeArea(
         child: Column(
           children: [
+            // expression and answer - display area
             Expanded(
               flex: 15,
-              // expression and answer
-              child: DisplayArea(
-                expression: _expression,
-                focussedChunk: _focussedChunk,
-                onChunkTap: (int focusOnChunk) {
-                  setState(() {
-                    _focussedChunk = focusOnChunk;
-                  });
-                },
-                answer: _answer,
+              child: Padding(
+                padding: const .symmetric(horizontal: 4),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // height of display area
+                    final double displayHeight = constraints.maxHeight;
+                    // width of display area
+                    final double displayWidth = constraints.maxWidth;
+                    return DisplayArea(
+                      displayHeight: displayHeight,
+                      displayWidth: displayWidth,
+                      expression: _expression,
+                      focussedChunk: _focussedChunk,
+                      onChunkTap: (int focusOnChunk) {
+                        setState(() {
+                          _focussedChunk = focusOnChunk;
+                        });
+                      },
+                      answer: _answer,
+                    );
+                  },
+                ),
               ),
             ),
             // TODO: implement - roast area

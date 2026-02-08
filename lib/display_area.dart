@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:roastcalc/theme_extension.dart';
 
 class DisplayArea extends StatelessWidget {
+  // height of display area
+  final double displayHeight;
+  // width of display area
+  final double displayWidth;
+
   // list of string chunks that make up expression
   final List<String> expression;
   // index of chunk currently focussed
@@ -13,6 +18,8 @@ class DisplayArea extends StatelessWidget {
   final String answer;
 
   const DisplayArea({
+    required this.displayHeight,
+    required this.displayWidth,
     required this.expression,
     required this.focussedChunk,
     required this.onChunkTap,
@@ -28,47 +35,55 @@ class DisplayArea extends StatelessWidget {
       child: Column(
         // right allign text and cursor
         crossAxisAlignment: .end,
+        mainAxisAlignment: .spaceBetween,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            // need constrained height or listview crashes app
-            child: SizedBox(
-              height: 64,
-              child: ListView.builder(
-                scrollDirection: .horizontal,
-                // start from right side
-                reverse: true,
-                itemCount: expression.length, // dictated by number of chunks
-                itemBuilder: (context, index) {
-                  // reversed - 0 index here is the last item in expression list
-                  final int correctIndex = expression.length - 1 - index;
-                  // get specific chunk
-                  final String chunk = expression[correctIndex];
-                  // check if this is the one selected
-                  final bool isChunkFocussed = (correctIndex == focussedChunk);
-                  return GestureDetector(
-                    // trigger what to do when chunk tapped
-                    onTap: () => onChunkTap(correctIndex),
-                    child: Row(
-                      children: [
-                        Text(chunk, style: context.textTheme.displayLarge),
-                        // only show cursor if this chunk is active
-                        if (isChunkFocussed) const Cursor(),
-                      ],
-                    ),
-                  );
-                },
-              ),
+          SizedBox(
+            height: displayHeight - 48,
+            child: ListView.builder(
+              scrollDirection: .horizontal,
+              // start from right side
+              reverse: true,
+              itemCount: expression.length, // dictated by number of chunks
+              itemBuilder: (context, index) {
+                // reversed - 0 index here is the last item in expression list
+                final int correctIndex = expression.length - 1 - index;
+                // get specific chunk
+                final String chunk = expression[correctIndex];
+                // check if this is the one selected
+                final bool isChunkFocussed = (correctIndex == focussedChunk);
+                return GestureDetector(
+                  // trigger what to do when chunk tapped
+                  onTap: () => onChunkTap(correctIndex),
+                  child: Row(
+                    crossAxisAlignment: .end,
+                    children: [
+                      Text(
+                        // show cursor even if expression is just one chunk ''
+                        (focussedChunk == 0 && chunk == '') ? ' ' : chunk,
+                        style: TextStyle(fontSize: displayHeight - 56),
+                      ),
+                      // only show cursor if this chunk is active
+                      if (isChunkFocussed)
+                        Cursor(blinkerHeight: displayHeight - 56),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
-          Text(
-            answer,
-            style:
-                !(answer == '∞' || answer == '−∞' || answer == 'Indeterminate')
-                ? context.textTheme.headlineMedium
-                : context.textTheme.headlineMedium!.copyWith(
-                    color: context.colorScheme.error,
-                  ),
+          Padding(
+            padding: const .symmetric(vertical: 8),
+            child: Text(
+              answer,
+              style:
+                  !(answer == 'Infinity' ||
+                      answer == '-Infinity' ||
+                      answer == 'Indeterminate')
+                  ? context.textTheme.headlineSmall
+                  : context.textTheme.headlineSmall!.copyWith(
+                      color: context.colorScheme.error,
+                    ),
+            ),
           ),
         ],
       ),
@@ -78,7 +93,8 @@ class DisplayArea extends StatelessWidget {
 
 // widget for blinking cursor
 class Cursor extends StatefulWidget {
-  const Cursor({super.key});
+  final double blinkerHeight;
+  const Cursor({required this.blinkerHeight, super.key});
 
   @override
   State<Cursor> createState() => _CursorState();
@@ -110,12 +126,12 @@ class _CursorState extends State<Cursor> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 64,
+      height: widget.blinkerHeight,
       // draw thin line that blinks
       child: VerticalDivider(
         // transparent when hidden, primary color when visible
         color: _visible ? context.colorScheme.primary : Colors.transparent,
-        width: 0,
+        width: 0, // no padding on left or right
         thickness: 2,
       ),
     );
