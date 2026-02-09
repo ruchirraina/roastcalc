@@ -17,6 +17,9 @@ class _HomeState extends State<Home> {
   // holds history panel visibility info and controls grid layout
   bool _panelOpen = false;
 
+  // list of equation and answer strings
+  List<(String, String)> _history = [];
+
   // entire expression is divided into list of chunks - format example: '67+'
   // initially one empty '' chunk
   List<String> _expression = [''];
@@ -35,6 +38,8 @@ class _HomeState extends State<Home> {
       }
       setState(() {
         if (_answer.isNotEmpty) {
+          // store in history
+          _history.insert(0, (_expression.join(), _answer));
           _expression = [_answer]; // new expression is just the answer chunk
         }
         _focussedChunk = 0; // focus on that chunk
@@ -256,6 +261,52 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void _changeCurrentChunk(int index, String answer) {
+    // current chunk
+    String currentChunk = _expression[_focussedChunk];
+
+    final bool currentChunkEndsWithOperator =
+        (currentChunk.endsWith('%') ||
+        currentChunk.endsWith('÷') ||
+        currentChunk.endsWith('×') ||
+        currentChunk.endsWith('−') ||
+        currentChunk.endsWith('+'));
+
+    if (currentChunkEndsWithOperator && _expression.length > 1) {
+      // more than one chunk and in between
+      if (_focussedChunk < (_expression.length - 1)) {
+        // replace chunk but append with operator
+        setState(() {
+          _expression[_focussedChunk] =
+              answer + currentChunk[currentChunk.length - 1];
+          _updateAnswer();
+        });
+        // more than one chunk and at end
+      } else if (_focussedChunk == _expression.length - 1) {
+        // move focus to new chunk and insert input there
+        _focussedChunk++;
+        setState(() {
+          _expression.add(answer);
+          _updateAnswer();
+        });
+      }
+      return;
+    }
+
+    // one chunk
+    if (currentChunk == '−') {
+      setState(() {
+        _expression[_focussedChunk] = '-$answer';
+        _updateAnswer();
+      });
+    } else {
+      setState(() {
+        _expression[_focussedChunk] = answer;
+        _updateAnswer();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -352,7 +403,23 @@ class _HomeState extends State<Home> {
                           duration: const Duration(milliseconds: 300),
                           // approrpriate curve
                           curve: Curves.fastOutSlowIn,
-                          child: HistoryPanel(),
+                          child: HistoryPanel(
+                            history: _history,
+                            // change current chunk implementation
+                            changeCurrentChunk: _changeCurrentChunk,
+                            // clear a history
+                            clearThisHistory: (int index) {
+                              setState(() {
+                                _history.removeAt(index);
+                              });
+                            },
+                            // clear all history
+                            clearHistroy: () {
+                              setState(() {
+                                _history = [];
+                              });
+                            },
+                          ),
                         ),
                       ],
                     );
