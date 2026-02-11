@@ -272,8 +272,8 @@ class _HomeState extends State<Home> {
         currentChunk.endsWith('−') ||
         currentChunk.endsWith('+'));
 
-    if (currentChunkEndsWithOperator && _expression.length > 1) {
-      // more than one chunk and in between
+    if (currentChunkEndsWithOperator && currentChunk != '−') {
+      // more than one chunk and in between ends with operator
       if (_focussedChunk < (_expression.length - 1)) {
         // replace chunk but append with operator
         setState(() {
@@ -281,7 +281,7 @@ class _HomeState extends State<Home> {
               answer + currentChunk[currentChunk.length - 1];
           _updateAnswer();
         });
-        // more than one chunk and at end
+        // more than one chunk and at end or just one chunk ends with operator
       } else if (_focussedChunk == _expression.length - 1) {
         // move focus to new chunk and insert input there
         _focussedChunk++;

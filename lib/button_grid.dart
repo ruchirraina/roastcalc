@@ -81,12 +81,17 @@ class ButtonGrid extends StatelessWidget {
                                   context.colorScheme.errorContainer, // red
                             ),
                             onPressed: () => onButtonPress(_buttonLabels[0]),
-                            child: Text(
-                              _buttonLabels[0],
-                              // appropriate style for AC button
-                              style: context.textTheme.headlineMedium!.copyWith(
-                                color: context.colorScheme.onErrorContainer,
-                                fontWeight: .bold,
+                            child: FittedBox(
+                              fit: .scaleDown,
+                              child: Text(
+                                _buttonLabels[0],
+                                // appropriate style for AC button
+                                style: context.textTheme.headlineMedium!
+                                    .copyWith(
+                                      color:
+                                          context.colorScheme.onErrorContainer,
+                                      fontWeight: .bold,
+                                    ),
                               ),
                             ),
                           )
@@ -98,11 +103,13 @@ class ButtonGrid extends StatelessWidget {
                               shape: const CircleBorder(),
                             ),
                             onPressed: () => onButtonPress(_buttonLabels[2]),
-                            child: Text(
-                              _buttonLabels[2],
-                              // appropriate style for % button
-                              style: context.textTheme.headlineLarge!.copyWith(
-                                fontWeight: .bold,
+                            child: FittedBox(
+                              fit: .scaleDown,
+                              child: Text(
+                                _buttonLabels[2],
+                                // appropriate style for % button
+                                style: context.textTheme.headlineLarge!
+                                    .copyWith(fontWeight: .bold),
                               ),
                             ),
                           )
@@ -114,12 +121,16 @@ class ButtonGrid extends StatelessWidget {
                             ),
                             onPressed: () =>
                                 onButtonPress(_buttonLabels[4 * i + j]),
-                            child: Text(
-                              _buttonLabels[4 * i + j],
-                              // appropriate style for numbers
-                              style: context.textTheme.headlineLarge!.copyWith(
-                                color: context.colorScheme.primary,
-                                fontWeight: .bold,
+                            child: FittedBox(
+                              fit: .scaleDown,
+                              child: Text(
+                                _buttonLabels[4 * i + j],
+                                // appropriate style for numbers
+                                style: context.textTheme.headlineLarge!
+                                    .copyWith(
+                                      color: context.colorScheme.primary,
+                                      fontWeight: .bold,
+                                    ),
                               ),
                             ),
                           ),
@@ -162,12 +173,15 @@ class ButtonGrid extends StatelessWidget {
                               shape: const CircleBorder(),
                             ),
                             onPressed: () => onButtonPress(_buttonLabels[19]),
-                            child: Text(
-                              _buttonLabels[19],
-                              // appropriate size and style for =
-                              style: context.textTheme.displaySmall!.copyWith(
-                                color: context.colorScheme.onPrimary,
-                                fontWeight: .bold,
+                            child: FittedBox(
+                              fit: .scaleDown,
+                              child: Text(
+                                _buttonLabels[19],
+                                // appropriate size and style for =
+                                style: context.textTheme.displaySmall!.copyWith(
+                                  color: context.colorScheme.onPrimary,
+                                  fontWeight: .bold,
+                                ),
                               ),
                             ),
                           )
@@ -179,11 +193,13 @@ class ButtonGrid extends StatelessWidget {
                             ),
                             onPressed: () =>
                                 onButtonPress(_buttonLabels[4 * (i + 1) - 1]),
-                            child: Text(
-                              _buttonLabels[4 * (i + 1) - 1],
-                              // appropriate size and style for operators
-                              style: context.textTheme.displayMedium!.copyWith(
-                                fontWeight: .bold,
+                            child: FittedBox(
+                              fit: .scaleDown,
+                              child: Text(
+                                _buttonLabels[4 * (i + 1) - 1],
+                                // appropriate size and style for operators
+                                style: context.textTheme.displayMedium!
+                                    .copyWith(fontWeight: .bold),
                               ),
                             ),
                           ),
@@ -214,10 +230,14 @@ class ButtonGrid extends StatelessWidget {
                 // circular
                 style: FilledButton.styleFrom(shape: const CircleBorder()),
                 onPressed: () => onButtonPress(_buttonLabels[1]),
-                child: const Icon(
-                  Icons.backspace_outlined,
-                  size: 32, // appropriate size
-                  applyTextScaling: true, // so it doesn't look tiny if font big
+                child: const FittedBox(
+                  fit: .scaleDown,
+                  child: Icon(
+                    Icons.backspace_outlined,
+                    size: 32, // appropriate size
+                    applyTextScaling:
+                        true, // so it doesn't look tiny if font big
+                  ),
                 ),
               ),
             ),

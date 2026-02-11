@@ -54,9 +54,12 @@ class HistoryPanel extends StatelessWidget {
                               crossAxisAlignment: .start,
                               children: [
                                 Text(equation),
-                                Text(
-                                  '= $answer', // = sign before answer
-                                  style: context.textTheme.titleLarge,
+                                FittedBox(
+                                  fit: .scaleDown,
+                                  child: Text(
+                                    '= $answer', // = sign before answer
+                                    style: context.textTheme.titleLarge,
+                                  ),
                                 ),
                               ],
                             ),

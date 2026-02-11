@@ -29,9 +29,19 @@ class DisplayArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // calculate dynamic size
+    final int length = expression.join().length;
+    double dynamicFontSize;
+
+    if (length <= 8) {
+      dynamicFontSize = displayHeight - 56;
+    } else if (length <= 12) {
+      dynamicFontSize = displayHeight - 64;
+    } else {
+      dynamicFontSize = displayHeight - 72;
+    }
     return Align(
-      // keep calculator text at top right
-      alignment: .topRight,
+      alignment: Alignment.topRight,
       child: Column(
         // right allign text and cursor
         crossAxisAlignment: .end,
@@ -40,10 +50,9 @@ class DisplayArea extends StatelessWidget {
           SizedBox(
             height: displayHeight - 48,
             child: ListView.builder(
-              scrollDirection: .horizontal,
-              // start from right side
+              scrollDirection: Axis.horizontal,
               reverse: true,
-              itemCount: expression.length, // dictated by number of chunks
+              itemCount: expression.length,
               itemBuilder: (context, index) {
                 // reversed - 0 index here is the last item in expression list
                 final int correctIndex = expression.length - 1 - index;
@@ -51,6 +60,7 @@ class DisplayArea extends StatelessWidget {
                 final String chunk = expression[correctIndex];
                 // check if this is the one selected
                 final bool isChunkFocussed = (correctIndex == focussedChunk);
+
                 return GestureDetector(
                   // trigger what to do when chunk tapped
                   onTap: () => onChunkTap(correctIndex),
@@ -60,7 +70,9 @@ class DisplayArea extends StatelessWidget {
                       Text(
                         // show cursor even if expression is just one chunk ''
                         (focussedChunk == 0 && chunk == '') ? ' ' : chunk,
-                        style: TextStyle(fontSize: displayHeight - 56),
+                        style: TextStyle(
+                          fontSize: dynamicFontSize, // use calculated size
+                        ),
                       ),
                       // only show cursor if this chunk is active
                       if (isChunkFocussed)
@@ -73,16 +85,19 @@ class DisplayArea extends StatelessWidget {
           ),
           Padding(
             padding: const .symmetric(vertical: 8),
-            child: Text(
-              answer,
-              style:
-                  !(answer == 'Infinity' ||
-                      answer == '-Infinity' ||
-                      answer == 'Indeterminate')
-                  ? context.textTheme.headlineSmall
-                  : context.textTheme.headlineSmall!.copyWith(
-                      color: context.colorScheme.error,
-                    ),
+            child: FittedBox(
+              fit: .scaleDown,
+              child: Text(
+                answer,
+                style:
+                    !(answer == 'Infinity' ||
+                        answer == '-Infinity' ||
+                        answer == 'Indeterminate')
+                    ? context.textTheme.headlineSmall
+                    : context.textTheme.headlineSmall!.copyWith(
+                        color: context.colorScheme.error,
+                      ),
+              ),
             ),
           ),
         ],
@@ -131,7 +146,7 @@ class _CursorState extends State<Cursor> {
       child: VerticalDivider(
         // transparent when hidden, primary color when visible
         color: _visible ? context.colorScheme.primary : Colors.transparent,
-        width: 0, // no padding on left or right
+        width: 2, // minimal
         thickness: 2,
       ),
     );
