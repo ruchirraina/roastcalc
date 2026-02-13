@@ -1,9 +1,11 @@
+// TODO: history panel animations when content comes and goes
+
 import 'package:flutter/material.dart';
-import 'package:roastcalc/theme_extension.dart';
+import 'package:roastcalc/services/theme_extension.dart';
 
 class HistoryPanel extends StatelessWidget {
-  // list of equation and answer strings
-  final List<(String, String)> history;
+  // list of strings of format: expression=answer
+  final List<String> history;
   // recieve function - what to do when user taps a history
   final void Function(int, String) changeCurrentChunk;
   // recieve fucntion - what to do when user delete icon button for a history
@@ -31,53 +33,63 @@ class HistoryPanel extends StatelessWidget {
           Expanded(
             flex: 9,
             // dynamic scrollable list of past calculations
-            child: ListView.builder(
-              // number of past calculations
-              itemCount: history.length,
-              itemBuilder: (context, index) {
-                // store current equation
-                String equation = history[index].$1;
-                // store current answer
-                String answer = history[index].$2;
-                return Card(
-                  child: Padding(
-                    padding: const .all(8), // cool
-                    // equation and answers and delete this history
-                    child: Row(
-                      // seperate on either ends
-                      mainAxisAlignment: .spaceBetween,
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => changeCurrentChunk(index, answer),
-                            child: Column(
-                              crossAxisAlignment: .start,
-                              children: [
-                                Text(equation),
-                                FittedBox(
-                                  fit: .scaleDown,
-                                  child: Text(
-                                    '= $answer', // = sign before answer
-                                    style: context.textTheme.titleLarge,
+            child: (history.isNotEmpty)
+                ? ListView.builder(
+                    // number of past calculations
+                    itemCount: history.length,
+                    itemBuilder: (context, index) {
+                      int reverseIndex = history.length - 1 - index;
+                      // store current equation
+                      String equation = history[reverseIndex].split('=').first;
+                      // store current answer
+                      String answer = history[reverseIndex].split('=').last;
+                      return Card(
+                        child: Padding(
+                          padding: const .all(8), // cool
+                          // equation and answers and delete this history
+                          child: Row(
+                            // seperate on either ends
+                            mainAxisAlignment: .spaceBetween,
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      changeCurrentChunk(index, answer),
+                                  child: Column(
+                                    crossAxisAlignment: .start,
+                                    children: [
+                                      Text(equation),
+                                      FittedBox(
+                                        fit: .scaleDown,
+                                        child: Text(
+                                          '= $answer', // = sign before answer
+                                          style: context.textTheme.titleLarge,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              // delete button for deletion of current history
+                              IconButton(
+                                onPressed: () => clearThisHistory(reverseIndex),
+                                icon: Icon(Icons.delete_outline),
+                              ),
+                            ],
                           ),
                         ),
-                        // delete button for deletion of current history
-                        IconButton(
-                          onPressed: () => clearThisHistory(index),
-                          icon: Icon(Icons.delete_outline),
-                        ),
-                      ],
+                      );
+                    },
+                  )
+                : Center(
+                    child: Text(
+                      'NO SAVED HISTORY',
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        fontWeight: .bold,
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
           ),
-          Divider(height: 8, thickness: 2),
           // clear History Button
           Expanded(
             flex: 1,

@@ -1,6 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:roastcalc/theme_extension.dart';
+import 'package:roastcalc/services/theme_extension.dart';
 
 // my github link
 final Uri _url = Uri.parse('https://github.com/ruchirraina');
@@ -29,24 +30,28 @@ void showInfoPopUp(BuildContext context) {
               ),
             ),
             // small text for version info
-            Text('v0.7.5', style: context.textTheme.labelSmall),
+            Text('v0.7.7', style: context.textTheme.labelSmall),
           ],
         ),
-        content: Wrap(
-          children: [
-            Text('Made with 🤍. Check out my: '),
-            // when tapped trigger going to my github through device browser
-            GestureDetector(
-              onTap: () => _launchGithub(), // handler function
-              child: Text(
-                'Github',
+        content: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'Made with 🤍.\nCheck out my: ',
+                style: context.textTheme.bodyMedium,
+              ),
+              // when tapped trigger going to my github through device browser
+              TextSpan(
+                text: 'Github',
                 style: context.textTheme.bodyMedium!.copyWith(
                   fontWeight: .bold, // emphasize
                   color: context.colorScheme.primary, // highlight
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => _launchGithub(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         // dismiss by button or tapping outside popup boundaires
         actions: [

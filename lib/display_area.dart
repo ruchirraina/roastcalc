@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:roastcalc/theme_extension.dart';
+import 'package:roastcalc/services/theme_extension.dart';
 
 class DisplayArea extends StatelessWidget {
   // height of display area

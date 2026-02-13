@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:roastcalc/theme_extension.dart';
+import 'package:roastcalc/services/theme_extension.dart';
 
 class ButtonGrid extends StatelessWidget {
   // box parameters that hold circular buttons with padding

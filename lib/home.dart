@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roastcalc/services/history_storage.dart';
 import 'package:math_expressions/math_expressions.dart' hide Stack;
 import 'package:roastcalc/info_popup.dart';
 import 'package:roastcalc/display_area.dart';
@@ -17,9 +18,6 @@ class _HomeState extends State<Home> {
   // holds history panel visibility info and controls grid layout
   bool _panelOpen = false;
 
-  // list of equation and answer strings
-  List<(String, String)> _history = [];
-
   // entire expression is divided into list of chunks - format example: '67+'
   // initially one empty '' chunk
   List<String> _expression = [''];
@@ -27,6 +25,9 @@ class _HomeState extends State<Home> {
   int _focussedChunk = 0;
 
   String _answer = '';
+
+  // list of equation and answer strings
+  List<String> _history = HistoryStorage.getHistory();
 
   void _onButtonPress(String input) {
     if (input == '=') {
@@ -39,7 +40,8 @@ class _HomeState extends State<Home> {
       setState(() {
         if (_answer.isNotEmpty) {
           // store in history
-          _history.insert(0, (_expression.join(), _answer));
+          _history.add('${_expression.join()}=$_answer');
+          HistoryStorage.addHistory(expressionAnswerList: _history);
           _expression = [_answer]; // new expression is just the answer chunk
         }
         _focussedChunk = 0; // focus on that chunk
@@ -249,6 +251,10 @@ class _HomeState extends State<Home> {
       // evaluate expression and return result as string
       String result = evaluator.evaluate(parsedExpression).toString();
 
+      if (result.contains('-')) {
+        result = result.replaceAll('-', '−');
+      }
+
       // if ends with .0 remove it
       if (result.endsWith('.0')) {
         result = result.substring(0, result.length - 2);
@@ -273,6 +279,10 @@ class _HomeState extends State<Home> {
         currentChunk.endsWith('+'));
 
     if (currentChunkEndsWithOperator && currentChunk != '−') {
+      if (answer.startsWith('−')) {
+        _onButtonPress('−');
+        answer = answer.substring(1);
+      }
       // more than one chunk and in between ends with operator
       if (_focussedChunk < (_expression.length - 1)) {
         // replace chunk but append with operator
@@ -293,7 +303,7 @@ class _HomeState extends State<Home> {
       return;
     }
 
-    // one chunk
+    // one chunk does not end with operator
     if (currentChunk == '−') {
       setState(() {
         _expression[_focussedChunk] = '-$answer';
@@ -411,12 +421,18 @@ class _HomeState extends State<Home> {
                             clearThisHistory: (int index) {
                               setState(() {
                                 _history.removeAt(index);
+                                HistoryStorage.addHistory(
+                                  expressionAnswerList: _history,
+                                );
                               });
                             },
                             // clear all history
                             clearHistroy: () {
                               setState(() {
                                 _history = [];
+                                HistoryStorage.addHistory(
+                                  expressionAnswerList: _history,
+                                );
                               });
                             },
                           ),
