@@ -1,11 +1,14 @@
-// TODO: history panel animations when content comes and goes
-
 import 'package:flutter/material.dart';
 import 'package:roastcalc/services/theme_extension.dart';
+import 'package:roastcalc/one_history.dart';
 
 class HistoryPanel extends StatelessWidget {
   // list of strings of format: expression=answer
   final List<String> history;
+  // key for animated list in history panel
+  final GlobalKey<AnimatedListState> historyListKey;
+  // #include<iostream> using
+  final Duration animDuration;
   // recieve function - what to do when user taps a history
   final void Function(int, String) changeCurrentChunk;
   // recieve fucntion - what to do when user delete icon button for a history
@@ -14,6 +17,8 @@ class HistoryPanel extends StatelessWidget {
   final void Function() clearHistroy;
   const HistoryPanel({
     required this.history,
+    required this.historyListKey,
+    required this.animDuration,
     required this.changeCurrentChunk,
     required this.clearThisHistory,
     required this.clearHistroy,
@@ -33,62 +38,62 @@ class HistoryPanel extends StatelessWidget {
           Expanded(
             flex: 9,
             // dynamic scrollable list of past calculations
-            child: (history.isNotEmpty)
-                ? ListView.builder(
-                    // number of past calculations
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      int reverseIndex = history.length - 1 - index;
-                      // store current equation
-                      String equation = history[reverseIndex].split('=').first;
-                      // store current answer
-                      String answer = history[reverseIndex].split('=').last;
-                      return Card(
-                        child: Padding(
-                          padding: const .all(8), // cool
-                          // equation and answers and delete this history
-                          child: Row(
-                            // seperate on either ends
-                            mainAxisAlignment: .spaceBetween,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      changeCurrentChunk(index, answer),
-                                  child: Column(
-                                    crossAxisAlignment: .start,
-                                    children: [
-                                      Text(equation),
-                                      FittedBox(
-                                        fit: .scaleDown,
-                                        child: Text(
-                                          '= $answer', // = sign before answer
-                                          style: context.textTheme.titleLarge,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // delete button for deletion of current history
-                              IconButton(
-                                onPressed: () => clearThisHistory(reverseIndex),
-                                icon: Icon(Icons.delete_outline),
-                              ),
-                            ],
+            child: Stack(
+              children: [
+                AnimatedOpacity(
+                  opacity: (history.isEmpty) ? 0.55 : 0,
+                  duration: const Duration(milliseconds: 150),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: .center,
+                      children: [
+                        Padding(
+                          padding: const .all(8),
+                          child: Image.asset(
+                            (context.theme.brightness == .dark)
+                                ? 'lib/assets/no_history_dark_mode.png'
+                                : 'lib/assets/no_history_light_mode.png',
+                            width: 75,
+                            height: 75,
                           ),
                         ),
-                      );
-                    },
-                  )
-                : Center(
-                    child: Text(
-                      'NO SAVED HISTORY',
-                      style: context.textTheme.bodyMedium!.copyWith(
-                        fontWeight: .bold,
-                      ),
+                        Text(
+                          'NO HISTORY',
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            fontWeight: .bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+                SizedBox(
+                  child: ColoredBox(
+                    color: Colors.transparent,
+                    child: AnimatedList(
+                      key: historyListKey,
+                      // number of past calculations
+                      initialItemCount: history.length,
+                      itemBuilder: (context, index, animation) {
+                        // store current expression
+                        String expression = history[index].split('=').first;
+                        // store current answer
+                        String answer = history[index].split('=').last;
+                        return OneHistory(
+                          expression: expression,
+                          answer: answer,
+                          animation: animation,
+                          changeCurrentChunk: () =>
+                              changeCurrentChunk(index, answer),
+                          clearThisHistory: () => clearThisHistory(index),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // no history
           ),
           // clear History Button
           Expanded(

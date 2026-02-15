@@ -67,11 +67,14 @@ class DisplayArea extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: .end,
                     children: [
-                      Text(
-                        // show cursor even if expression is just one chunk ''
-                        (focussedChunk == 0 && chunk == '') ? ' ' : chunk,
-                        style: TextStyle(
-                          fontSize: dynamicFontSize, // use calculated size
+                      Opacity(
+                        opacity: isChunkFocussed ? 1 : 0.6,
+                        child: Text(
+                          // show cursor even if expression is just one chunk ''
+                          (focussedChunk == 0 && chunk == '') ? ' ' : chunk,
+                          style: TextStyle(
+                            fontSize: dynamicFontSize, // use calculated size
+                          ),
                         ),
                       ),
                       // only show cursor if this chunk is active

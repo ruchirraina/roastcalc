@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:roastcalc/services/history_storage.dart';
-import 'package:math_expressions/math_expressions.dart' hide Stack;
 import 'package:roastcalc/info_popup.dart';
+import 'package:roastcalc/services/expression_eval.dart';
 import 'package:roastcalc/display_area.dart';
 import 'package:roastcalc/roast_area.dart';
 import 'package:roastcalc/button_grid.dart';
 import 'package:roastcalc/history_panel.dart';
+import 'package:roastcalc/one_history.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -27,7 +28,14 @@ class _HomeState extends State<Home> {
   String _answer = '';
 
   // list of equation and answer strings
-  List<String> _history = HistoryStorage.getHistory();
+  final List<String> _history = HistoryStorage.getHistory();
+
+  // key for animated list in history panel
+  final GlobalKey<AnimatedListState> _historyListKey =
+      GlobalKey<AnimatedListState>();
+
+  // duration for animations in history panel
+  final Duration _animDuration = const Duration(milliseconds: 300);
 
   void _onButtonPress(String input) {
     if (input == '=') {
@@ -40,7 +48,8 @@ class _HomeState extends State<Home> {
       setState(() {
         if (_answer.isNotEmpty) {
           // store in history
-          _history.add('${_expression.join()}=$_answer');
+          _history.insert(0, '${_expression.join()}=$_answer');
+          _historyListKey.currentState?.insertItem(0, duration: _animDuration);
           HistoryStorage.addHistory(expressionAnswerList: _history);
           _expression = [_answer]; // new expression is just the answer chunk
         }
@@ -204,7 +213,7 @@ class _HomeState extends State<Home> {
     // except when just one chunk as that is not really an expression
     if (_expression.length > 1 || _expression[_focussedChunk].endsWith('%')) {
       setState(() {
-        _answer = _expressionEvaluator(_expression.join());
+        _answer = expressionEvaluator(_expression.join());
       });
     } else {
       setState(() {
@@ -213,60 +222,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // evaluate expression and return answer as string
-  String _expressionEvaluator(String expression) {
-    // sanitize expression - replace × with *, − with -, ÷ with /
-    String sanitizedExpression = expression
-        .replaceAll('×', '*')
-        .replaceAll('−', '-')
-        .replaceAll('÷', '/')
-        .replaceAll('%', '*0.01*');
-
-    final bool expressionEndsWithOperator =
-        (sanitizedExpression.endsWith('+') ||
-        sanitizedExpression.endsWith('-') ||
-        sanitizedExpression.endsWith('*') ||
-        sanitizedExpression.endsWith('/'));
-
-    if (expressionEndsWithOperator) {
-      sanitizedExpression = sanitizedExpression.substring(
-        0,
-        sanitizedExpression.length - 1,
-      );
-    }
-
-    try {
-      // create parser
-      ExpressionParser parser = GrammarParser();
-
-      // create parsed expression using parser
-      Expression parsedExpression = parser.parse(sanitizedExpression);
-
-      // create context model - not really needed but required by evaluator
-      ContextModel cm = ContextModel();
-
-      // create evaluator
-      ExpressionEvaluator evaluator = RealEvaluator(cm);
-
-      // evaluate expression and return result as string
-      String result = evaluator.evaluate(parsedExpression).toString();
-
-      if (result.contains('-')) {
-        result = result.replaceAll('-', '−');
-      }
-
-      // if ends with .0 remove it
-      if (result.endsWith('.0')) {
-        result = result.substring(0, result.length - 2);
-      } else if (result == 'NaN') {
-        result = 'Indeterminate';
-      }
-      return result;
-    } catch (e) {
-      return '';
-    }
-  }
-
+  // change current chunk implementation
   void _changeCurrentChunk(int index, String answer) {
     // current chunk
     String currentChunk = _expression[_focussedChunk];
@@ -279,8 +235,8 @@ class _HomeState extends State<Home> {
         currentChunk.endsWith('+'));
 
     if (currentChunkEndsWithOperator && currentChunk != '−') {
-      if (answer.startsWith('−')) {
-        _onButtonPress('−');
+      // prevent −− double
+      if (currentChunk.endsWith('−') && answer.startsWith('−')) {
         answer = answer.substring(1);
       }
       // more than one chunk and in between ends with operator
@@ -315,6 +271,49 @@ class _HomeState extends State<Home> {
         _updateAnswer();
       });
     }
+  }
+
+  // clear a history
+  void _clearThisHistory(int index) {
+    String removedItem = _history[index];
+    setState(() {
+      _history.removeAt(index);
+      _historyListKey.currentState?.removeItem(
+        index,
+        (context, animation) => OneHistory(
+          expression: removedItem.split('=').first,
+          answer: removedItem.split('=').last,
+          animation: animation,
+          changeCurrentChunk: () {},
+          clearThisHistory: () {},
+        ),
+        duration: _animDuration,
+      );
+      HistoryStorage.addHistory(expressionAnswerList: _history);
+    });
+  }
+
+  // clear all history
+  void _clearAllHistory() {
+    // loop through and delete all histories
+    for (int i = _history.length - 1; i >= 0; i--) {
+      String removedItem = _history[i];
+      setState(() {
+        _history.removeAt(i);
+        _historyListKey.currentState?.removeItem(
+          i,
+          (context, animation) => OneHistory(
+            expression: removedItem.split('=').first,
+            answer: removedItem.split('=').last,
+            animation: animation,
+            changeCurrentChunk: () {}, // it's being removed
+            clearThisHistory: () {}, // it's being removed
+          ),
+          duration: _animDuration,
+        );
+      });
+    }
+    HistoryStorage.addHistory(expressionAnswerList: _history);
   }
 
   @override
@@ -377,7 +376,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-            // TODO: implement - roast area
+
             Expanded(flex: 20, child: RoastArea()),
             Expanded(
               flex: 65,
@@ -415,26 +414,11 @@ class _HomeState extends State<Home> {
                           curve: Curves.fastOutSlowIn,
                           child: HistoryPanel(
                             history: _history,
-                            // change current chunk implementation
+                            historyListKey: _historyListKey,
+                            animDuration: _animDuration,
                             changeCurrentChunk: _changeCurrentChunk,
-                            // clear a history
-                            clearThisHistory: (int index) {
-                              setState(() {
-                                _history.removeAt(index);
-                                HistoryStorage.addHistory(
-                                  expressionAnswerList: _history,
-                                );
-                              });
-                            },
-                            // clear all history
-                            clearHistroy: () {
-                              setState(() {
-                                _history = [];
-                                HistoryStorage.addHistory(
-                                  expressionAnswerList: _history,
-                                );
-                              });
-                            },
+                            clearThisHistory: _clearThisHistory,
+                            clearHistroy: _clearAllHistory,
                           ),
                         ),
                       ],

@@ -30,7 +30,7 @@ void showInfoPopUp(BuildContext context) {
               ),
             ),
             // small text for version info
-            Text('v0.7.7', style: context.textTheme.labelSmall),
+            Text('v0.8.0', style: context.textTheme.labelSmall),
           ],
         ),
         content: RichText(
