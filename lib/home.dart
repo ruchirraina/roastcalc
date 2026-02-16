@@ -366,6 +366,16 @@ class _HomeState extends State<Home> {
                       expression: _expression,
                       focussedChunk: _focussedChunk,
                       onChunkTap: (int focusOnChunk) {
+                        // must end with operator when inserting chunk in b/w
+                        if (_focussedChunk > 0 &&
+                            _focussedChunk < _expression.length - 1 &&
+                            !(_expression[_focussedChunk].endsWith('%') ||
+                                _expression[_focussedChunk].endsWith('÷') ||
+                                _expression[_focussedChunk].endsWith('×') ||
+                                _expression[_focussedChunk].endsWith('−') ||
+                                _expression[_focussedChunk].endsWith('+'))) {
+                          return;
+                        }
                         setState(() {
                           _focussedChunk = focusOnChunk;
                         });
@@ -377,7 +387,7 @@ class _HomeState extends State<Home> {
               ),
             ),
 
-            Expanded(flex: 20, child: RoastArea()),
+            Expanded(flex: 20, child: RoastArea(history: _history)),
             Expanded(
               flex: 65,
               child: Padding(

@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:roastcalc/services/history_storage.dart';
-import 'package:roastcalc/home.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:roastcalc/services/theme_config.dart';
+import 'package:roastcalc/home.dart';
 
 void main() async {
   // ensure binding initialisation so we can make use of SharedPreferences
   WidgetsFlutterBinding.ensureInitialized();
 
+  // allow only vertical up orientation
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   // get SharedPreferences instance
   await HistoryStorage.init();
 
-  // allow only vertical up orientation
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // load envs
+  await dotenv.load(fileName: ".env");
 
   runApp(const MainApp());
 }
