@@ -29,8 +29,8 @@ class _RoastAreaState extends State<RoastArea> {
     // 1. Initial Roast
     _triggerRoast();
 
-    // 2. Periodic Check (Every 30 seconds)
-    _checkTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    // 2. Periodic Check (Every 150 seconds)
+    _checkTimer = Timer.periodic(const Duration(seconds: 150), (timer) {
       _checkConditionsAndRoast();
     });
   }
@@ -47,8 +47,8 @@ class _RoastAreaState extends State<RoastArea> {
     // condition A: history Changed
     bool historyChanged = !listEquals(widget.history, _lastProcessedHistory);
 
-    // condition B: force Refresh (Every 2 mins) even if history is same
-    bool forceRefresh = now.difference(_lastRoastTime).inMinutes >= 2;
+    // condition B: force Refresh (Every 5 mins) even if history is same
+    bool forceRefresh = now.difference(_lastRoastTime).inMinutes >= 5;
 
     if (historyChanged || forceRefresh) {
       _triggerRoast();

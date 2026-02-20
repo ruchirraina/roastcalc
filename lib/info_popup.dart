@@ -35,7 +35,7 @@ void showInfoPopUp(BuildContext context) {
             // small text for version info
             FittedBox(
               fit: .scaleDown,
-              child: Text('v1.0.0', style: context.textTheme.labelSmall),
+              child: Text('v1.0.1', style: context.textTheme.labelSmall),
             ),
           ],
         ),
@@ -44,7 +44,7 @@ void showInfoPopUp(BuildContext context) {
             children: [
               TextSpan(
                 text:
-                    'Do math. Get roasted. Gemini-powered, history-based burns\nMade with 🤍.\nCheck out my: ',
+                    'Do math 🤓. Get roasted 🔥. Gemini-powered, history-based burns.\nMade with 🤍.\nCheck out my: ',
                 style: context.textTheme.bodyMedium,
               ),
               // when tapped trigger going to my github through device browser

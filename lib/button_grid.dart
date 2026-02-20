@@ -109,7 +109,7 @@ class ButtonGrid extends StatelessWidget {
                                 _buttonLabels[2],
                                 // appropriate style for % button
                                 style: context.textTheme.headlineLarge!
-                                    .copyWith(fontWeight: .bold),
+                                    .copyWith(fontWeight: .w900),
                               ),
                             ),
                           )
@@ -230,6 +230,8 @@ class ButtonGrid extends StatelessWidget {
                 // circular
                 style: FilledButton.styleFrom(shape: const CircleBorder()),
                 onPressed: () => onButtonPress(_buttonLabels[1]),
+                // hold acts as AC
+                onLongPress: () => onButtonPress(_buttonLabels[0]),
                 child: const FittedBox(
                   fit: .scaleDown,
                   child: Icon(
