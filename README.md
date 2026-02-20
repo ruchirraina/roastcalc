@@ -2,6 +2,8 @@
 
 A personal project: an AI-based calculator that roasts your calculations with personalized humor powered by Google Gemini AI.
 
+**Do math. Get roasted — Gemini AI with history-aware roasts.**
+
 ## Features
 
 - 🧮 Full-featured calculator with basic operations, percentages, and decimals
@@ -37,6 +39,13 @@ flutter run
 ## How It Works
 
 The RoastArea component monitors your calculation history and uses Gemini AI to generate personalized roasts. When offline, it uses pre-written roasts instead.
+
+## 🖼️ Screenshots
+
+<div>
+	<img src="AppSS_1.png" alt="App Screenshot 1" width="320" />
+	<img src="AppSS_2.png" alt="App Screenshot 2" width="320" />
+</div>
 
 ## License
 
