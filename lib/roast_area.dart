@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart'; // For listEquals
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:roastcalc/services/theme_extension.dart';
-import '../services/roast_service.dart'; // Adjust path as needed
+import '../services/roast_service.dart';
 
 class RoastArea extends StatefulWidget {
   final List<String> history;
@@ -44,10 +44,10 @@ class _RoastAreaState extends State<RoastArea> {
   void _checkConditionsAndRoast() {
     final now = DateTime.now();
 
-    // Condition A: History Changed
+    // condition A: history Changed
     bool historyChanged = !listEquals(widget.history, _lastProcessedHistory);
 
-    // Condition B: Force Refresh (Every 2 mins) even if history is same
+    // condition B: force Refresh (Every 2 mins) even if history is same
     bool forceRefresh = now.difference(_lastRoastTime).inMinutes >= 2;
 
     if (historyChanged || forceRefresh) {

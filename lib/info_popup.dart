@@ -22,22 +22,29 @@ void showInfoPopUp(BuildContext context) {
           crossAxisAlignment: .start,
           children: [
             // app name
-            Text(
-              'RoastCalc🔥',
-              style: context.textTheme.headlineMedium!.copyWith(
-                fontWeight: .bold, // emphasize
-                color: context.colorScheme.primary,
+            FittedBox(
+              fit: .scaleDown,
+              child: Text(
+                'RoastCalc🔥',
+                style: context.textTheme.headlineMedium!.copyWith(
+                  fontWeight: .bold, // emphasize
+                  color: context.colorScheme.primary,
+                ),
               ),
             ),
             // small text for version info
-            Text('v0.9.0', style: context.textTheme.labelSmall),
+            FittedBox(
+              fit: .scaleDown,
+              child: Text('v1.0.0', style: context.textTheme.labelSmall),
+            ),
           ],
         ),
         content: RichText(
           text: TextSpan(
             children: [
               TextSpan(
-                text: 'Made with 🤍.\nCheck out my: ',
+                text:
+                    'Do math. Get roasted. Gemini-powered, history-based burns\nMade with 🤍.\nCheck out my: ',
                 style: context.textTheme.bodyMedium,
               ),
               // when tapped trigger going to my github through device browser
@@ -59,11 +66,14 @@ void showInfoPopUp(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text(
-              'CLOSE',
-              style: context.textTheme.bodyMedium!.copyWith(
-                fontWeight: .bold, // emphasize
-                color: context.colorScheme.error, // red
+            child: FittedBox(
+              fit: .scaleDown,
+              child: Text(
+                'CLOSE',
+                style: context.textTheme.bodyMedium!.copyWith(
+                  fontWeight: .bold, // emphasize
+                  color: context.colorScheme.error, // red
+                ),
               ),
             ),
           ),

@@ -24,6 +24,8 @@ class _HomeState extends State<Home> {
   List<String> _expression = [''];
   // current focussed chunk index - initially first(0)
   int _focussedChunk = 0;
+  // when a chunk is tapped and what previous chunk if was inserted in between
+  int _previousChunkInsertBetween = -1; // default -1
 
   String _answer = '';
 
@@ -101,33 +103,52 @@ class _HomeState extends State<Home> {
           }
           _updateAnswer();
           // if chunk in between or start and chunk ends with operator
-          // remove operator at end of chunk
-          // join it with next chunk and remove this chunk - shift focus to it
         } else {
           // handle case of two decimals in a row -
           // if current chunk and next chunk have decimals and remove later's .
-          final String nextChunkWithNoDecimals =
-              (currentChunk.contains('.') &&
-                  _expression[_focussedChunk + 1].contains('.'))
-              ? _expression[_focussedChunk + 1].replaceAll('.', '')
-              : _expression[_focussedChunk + 1];
-          _expression[_focussedChunk + 1] =
-              currentChunk.substring(0, currentChunk.length - 1) +
-              nextChunkWithNoDecimals;
-          _expression.removeAt(_focussedChunk);
+          if (currentChunk.contains('.') &&
+              _expression[_focussedChunk + 1].contains('.')) {
+            _expression[_focussedChunk + 1] = _expression[_focussedChunk + 1]
+                .replaceAll('.', '');
+          }
+          // remove last character
+          setState(() {
+            _expression[_focussedChunk] = currentChunk.substring(
+              0,
+              currentChunk.length - 1,
+            );
+            // update _previousChunkInsertBetween
+            _previousChunkInsertBetween = _focussedChunk;
+          });
           _updateAnswer();
         }
       });
       return;
     }
 
-    final bool isInputNumberOrDecimal =
-        (num.tryParse(input) != null || input == '00' || input == '.');
+    final bool isInputNumberOrDecimalOrMinus =
+        (num.tryParse(input) != null ||
+        input == '00' ||
+        input == '.' ||
+        input == '−');
 
     // new chunk creation
     if (currentChunkEndsWithOperator &&
         currentChunk != '−' &&
-        isInputNumberOrDecimal) {
+        isInputNumberOrDecimalOrMinus) {
+      if (input == '−') {
+        // prevent double −−
+        if (currentChunk.endsWith('−')) {
+          return;
+        }
+        // change last operand
+        if (currentChunk.endsWith('+')) {
+          _expression[_focussedChunk] =
+              currentChunk.substring(0, currentChunk.length - 1) + input;
+          _updateAnswer();
+          return;
+        }
+      }
       // conver 00 to 0 if new chunk empty
       if (input == '00') input = '0';
       // conver . to 0. if new chunk empty
@@ -139,6 +160,8 @@ class _HomeState extends State<Home> {
         // in bewteen
         if (_focussedChunk < _expression.length) {
           _expression.insert(_focussedChunk, input);
+          // update _previousChunkInsertBetween
+          _previousChunkInsertBetween = _focussedChunk;
           // at end
         } else {
           _expression.add(input);
@@ -189,10 +212,11 @@ class _HomeState extends State<Home> {
     } else if (isInputOperator &&
         currentChunk[currentChunk.length - 1] == '.') {
       return;
+    } else if (isInputOperator && currentChunk == '−') {
+      return;
       // if ends with operator and operator input - replace it with input
-    } else if (isInputOperator && currentChunkEndsWithOperator) {
-      // exception if just −
-      if (currentChunk == '−') return;
+      // except if input is minus
+    } else if (isInputOperatorExceptMinus && currentChunkEndsWithOperator) {
       setState(() {
         _expression[_focussedChunk] =
             currentChunk.substring(0, currentChunk.length - 1) + input;
@@ -220,6 +244,29 @@ class _HomeState extends State<Home> {
         _answer = '';
       });
     }
+  }
+
+  void _onChunkTap(int focusOnChunk) {
+    if (_previousChunkInsertBetween != -1) {
+      if (!(_expression[_previousChunkInsertBetween].endsWith('%') ||
+          _expression[_previousChunkInsertBetween].endsWith('÷') ||
+          _expression[_previousChunkInsertBetween].endsWith('×') ||
+          _expression[_previousChunkInsertBetween].endsWith('−') ||
+          _expression[_previousChunkInsertBetween].endsWith('+'))) {
+        if (focusOnChunk > _previousChunkInsertBetween) {
+          focusOnChunk--;
+        }
+        _expression[_previousChunkInsertBetween + 1] =
+            _expression[_previousChunkInsertBetween] +
+            _expression[_previousChunkInsertBetween + 1];
+        _expression.removeAt(_focussedChunk);
+        _previousChunkInsertBetween = -1; // reset it
+      }
+    }
+    // focus on current chunk and update the chunk
+    setState(() {
+      _focussedChunk = focusOnChunk;
+    });
   }
 
   // change current chunk implementation
@@ -365,21 +412,7 @@ class _HomeState extends State<Home> {
                       displayWidth: displayWidth,
                       expression: _expression,
                       focussedChunk: _focussedChunk,
-                      onChunkTap: (int focusOnChunk) {
-                        // must end with operator when inserting chunk in b/w
-                        if (_focussedChunk > 0 &&
-                            _focussedChunk < _expression.length - 1 &&
-                            !(_expression[_focussedChunk].endsWith('%') ||
-                                _expression[_focussedChunk].endsWith('÷') ||
-                                _expression[_focussedChunk].endsWith('×') ||
-                                _expression[_focussedChunk].endsWith('−') ||
-                                _expression[_focussedChunk].endsWith('+'))) {
-                          return;
-                        }
-                        setState(() {
-                          _focussedChunk = focusOnChunk;
-                        });
-                      },
+                      onChunkTap: _onChunkTap,
                       answer: _answer,
                     );
                   },

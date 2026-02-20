@@ -57,10 +57,13 @@ class HistoryPanel extends StatelessWidget {
                             height: 75,
                           ),
                         ),
-                        Text(
-                          'NO HISTORY',
-                          style: context.textTheme.bodyMedium!.copyWith(
-                            fontWeight: .bold,
+                        FittedBox(
+                          fit: .scaleDown,
+                          child: Text(
+                            'NO HISTORY',
+                            style: context.textTheme.bodyMedium!.copyWith(
+                              fontWeight: .bold,
+                            ),
                           ),
                         ),
                       ],
@@ -101,11 +104,14 @@ class HistoryPanel extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: clearHistroy,
               icon: Icon(Icons.delete, color: context.colorScheme.error), //red
-              label: Text(
-                'CLEAR HISTORY',
-                style: context.textTheme.bodyMedium!.copyWith(
-                  fontWeight: .bold, // emphasize
-                  color: context.colorScheme.error, // red
+              label: FittedBox(
+                fit: .scaleDown,
+                child: Text(
+                  'CLEAR HISTORY',
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    fontWeight: .bold, // emphasize
+                    color: context.colorScheme.error, // red
+                  ),
                 ),
               ),
               style: TextButton.styleFrom(
