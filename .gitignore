@@ -44,7 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Project Overview and the script that generates it
+# Project Overview and the script that generates it and other non-essential files
 generate_context.py
 workspace_context.md
 spec.md
+log.md
+rc_prompt.md
