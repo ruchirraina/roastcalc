@@ -6,15 +6,49 @@ class CalculatorService {
   String? evaluateExpression(String expression) {
     if (expression.trim().isEmpty) return null;
 
+    // Ignore single raw numbers
+    if (double.tryParse(expression.trim()) != null) {
+      return null;
+    }
+
     try {
-      // 1. Preprocess the raw string to handle visual layout tokens and library limitations.
       String processed = expression;
+
+      // Prepend zero to bare decimals
+      processed = processed.replaceAllMapped(
+        RegExp(r'(^|[-+*÷/×(]|\s)\.(\d+)'),
+        (match) => '${match[1]}0.${match[2]}',
+      );
+
+      // Implicit Multiplication: Number before parenthesis (e.g., 3(2) -> 3*(2))
+      processed = processed.replaceAllMapped(
+        RegExp(r'(\d)\s*\('),
+        (match) => '${match[1]}*(',
+      );
+
+      // Implicit Multiplication: Number after parenthesis (e.g., (1+1)2 -> (1+1)*2)
+      processed = processed.replaceAllMapped(
+        RegExp(r'\)\s*(\d|\.)'),
+        (match) => ')*${match[1]}',
+      );
+
+      // Implicit Multiplication: Parentheses touching (e.g., (2)(3) -> (2)*(3))
+      processed = processed.replaceAllMapped(
+        RegExp(r'\)\s*\('),
+        (match) => ')*(',
+      );
+
+      // Auto-wrap bare numbers after roots (e.g., √9 -> √(9), ³√8 -> ³√(8))
+      processed = processed.replaceAllMapped(
+        RegExp(r'(³?√)(\d+(\.\d+)?)'),
+        (match) => '${match[1]}(${match[2]})',
+      );
 
       // Translate basic visual UI symbols
       processed = processed.replaceAll('×', '*');
       processed = processed.replaceAll('÷', '/');
 
-      // Translate multi-character visual root symbols FIRST to prevent superscript collision
+      // Translate multi-character visual root symbols FIRST
       processed = processed.replaceAll('³√', 'cbrt');
       processed = processed.replaceAll('√', 'sqrt');
 
@@ -22,25 +56,23 @@ class CalculatorService {
       processed = processed.replaceAll('²', '^2');
       processed = processed.replaceAll('³', '^3');
 
-      // Handle percentage as a unary suffix
+      // Handle percentage with implicit multiplication
       processed = processed.replaceAllMapped(
-        RegExp(r'%(?!\s*[\d(])'),
-        (match) => ' / 100',
+        RegExp(r'%\s*(?=[\d(.])'),
+        (match) => ' / 100 * ',
       );
-
-      // Handle custom mod keyword
-      processed = processed.replaceAll('mod', '%');
+      processed = processed.replaceAll('%', ' / 100');
 
       // Handle programmatic square roots
       processed = processed.replaceAllMapped(
         RegExp(r'sqrt\(([^)]+)\)'),
-        (match) => '((${match[1]}) ^ 0.5)', // Added inner parentheses
+        (match) => '((${match[1]}) ^ 0.5)',
       );
 
       // Handle programmatic cube roots
       processed = processed.replaceAllMapped(
         RegExp(r'cbrt\(([^)]+)\)'),
-        (match) => '((${match[1]}) ^ (1 / 3))', // Added inner parentheses
+        (match) => '((${match[1]}) ^ (1 / 3))',
       );
 
       // 2. Parse and Evaluate
@@ -51,20 +83,23 @@ class CalculatorService {
       final RealEvaluator evaluator = RealEvaluator(context);
       final num result = evaluator.evaluate(parsedExpression);
 
-      // 3. Prevent floating point calculation drift
-      const double precisionFactor = 10000000000.0;
-      double roundedResult =
-          (result.toDouble() * precisionFactor).roundToDouble() /
-          precisionFactor;
-
-      final String formattedResult = _formatOutput(roundedResult);
-
-      // Ignore single raw numbers
-      if (formattedResult == expression.trim()) {
-        return null;
+      // Catch zero-division memory states
+      if (result.isNaN || result.isInfinite) {
+        return 'Undefined';
       }
 
-      return formattedResult;
+      // 3. Prevent floating point calculation drift
+      double roundedResult;
+      if (result % 1 == 0) {
+        roundedResult = result.toDouble();
+      } else {
+        const double precisionFactor = 10000000000.0;
+        roundedResult =
+            (result.toDouble() * precisionFactor).roundToDouble() /
+            precisionFactor;
+      }
+
+      return _formatOutput(roundedResult);
     } catch (e) {
       return null;
     }
