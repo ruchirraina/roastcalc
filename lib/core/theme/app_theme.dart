@@ -43,6 +43,11 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: _lightText, fontSize: _defaultFontSize),
       ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: _lightEquals,
+        selectionColor: _lightEquals.withValues(alpha: 0.3),
+        selectionHandleColor: _lightEquals,
+      ),
     );
   }
 
@@ -55,16 +60,21 @@ class AppTheme {
         primary: _darkDigits,
         onPrimary: _darkButtonText,
         secondary: _darkOperators,
-        onSecondary: Color(0xFF1E1E1E), // Dark text on operators for contrast
+        onSecondary: Color(0xFF1E1E1E),
         tertiary: _darkUtilities,
         onTertiary: _darkButtonText,
         primaryContainer: _darkEquals,
-        onPrimaryContainer: Color(0xFF111111), // Dark text on mustard
+        onPrimaryContainer: Color(0xFF111111),
         surface: _darkBackground,
         onSurface: _darkText,
       ),
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: _darkText, fontSize: _defaultFontSize),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: _darkEquals,
+        selectionColor: _darkEquals.withValues(alpha: 0.3),
+        selectionHandleColor: _darkEquals,
       ),
     );
   }

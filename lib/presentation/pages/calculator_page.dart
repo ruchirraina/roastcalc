@@ -26,7 +26,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
     super.dispose();
   }
 
-  // Dart 3 Pattern Matching using the correct Logical-OR (||) operator
   Color _getBackgroundColor(String label, ColorScheme scheme) =>
       switch (label) {
         '÷' ||
@@ -93,7 +92,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
           builder: (context, _) {
             return Column(
               children: [
-                // Display Area
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -106,22 +104,38 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        TextField(
-                          controller: _controller.expressionController,
-                          scrollController: _controller.scrollController,
-                          readOnly: true,
-                          showCursor: true,
-                          autofocus: true,
-                          cursorColor: colorScheme.primaryContainer,
-                          textAlign: TextAlign.right,
-                          maxLines: 1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          style: textTheme.bodyMedium?.copyWith(
-                            fontSize: CalculatorConstants.fontHuge,
+                        ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.transparent,
+                                Colors.white,
+                                Colors.white,
+                                Colors.transparent,
+                              ],
+                              stops: [0.0, 0.015, 0.985, 1.0],
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.dstIn,
+                          child: TextField(
+                            controller: _controller.expressionController,
+                            scrollController: _controller.scrollController,
+                            readOnly: true,
+                            showCursor: true,
+                            autofocus: true,
+                            cursorColor: colorScheme.primaryContainer,
+                            textAlign: TextAlign.right,
+                            maxLines: 1,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            style: textTheme.bodyMedium?.copyWith(
+                              fontSize: CalculatorConstants.fontHuge,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8.0),
@@ -142,8 +156,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     ),
                   ),
                 ),
-
-                // Roast Area
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -162,8 +174,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     child: const Center(child: Text('Roast Area Placeholder')),
                   ),
                 ),
-
-                // Button Grid Area
                 Expanded(
                   flex: 6,
                   child: LayoutBuilder(
@@ -193,6 +203,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           CalculatorConstants.gridPadding,
                         ),
                         child: Stack(
+                          clipBehavior: Clip.none,
                           children: CalculatorConstants.layout.map((keyData) {
                             final int currentRow = _controller.isExpanded
                                 ? keyData.row

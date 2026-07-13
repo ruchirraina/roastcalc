@@ -21,10 +21,48 @@ class CalculatorController extends ChangeNotifier {
     super.dispose();
   }
 
-  void _scrollToEnd() {
+  void _scrollToCursor() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.hasClients) {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      if (!scrollController.hasClients) return;
+
+      final text = expressionController.text;
+      if (text.isEmpty) return;
+
+      final selection = expressionController.selection;
+      final cursorPosition = selection.isValid
+          ? selection.baseOffset
+          : text.length;
+
+      final TextPainter painter = TextPainter(
+        text: TextSpan(
+          text: text.substring(0, cursorPosition),
+          style: const TextStyle(
+            fontFamily: 'SpaceMono',
+            fontSize: CalculatorConstants.fontHuge,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      final double cursorPixelPosition = painter.width;
+      final double viewportWidth = scrollController.position.viewportDimension;
+      final double currentScrollOffset = scrollController.offset;
+      final double maxScroll = scrollController.position.maxScrollExtent;
+
+      const double padding = 20.0;
+
+      if (cursorPixelPosition > currentScrollOffset + viewportWidth - padding) {
+        scrollController.animateTo(
+          (cursorPixelPosition - viewportWidth + padding).clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+        );
+      } else if (cursorPixelPosition < currentScrollOffset + padding) {
+        scrollController.animateTo(
+          (cursorPixelPosition - padding).clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
@@ -51,7 +89,7 @@ class CalculatorController extends ChangeNotifier {
     }
 
     notifyListeners();
-    _scrollToEnd();
+    _scrollToCursor();
   }
 
   void handleBackspaceLongPress() {
