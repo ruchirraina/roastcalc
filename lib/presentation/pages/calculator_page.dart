@@ -3,6 +3,7 @@ import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
+import '../widgets/history_panel.dart';
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage({super.key});
@@ -94,66 +95,110 @@ class _CalculatorPageState extends State<CalculatorPage> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CalculatorConstants.gridPadding * 1.5,
-                      vertical: CalculatorConstants.gridPadding / 2,
-                    ),
-                    alignment: Alignment.bottomRight,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        ShaderMask(
-                          shaderCallback: (Rect bounds) {
-                            return const LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.transparent,
-                                Colors.white,
-                                Colors.white,
-                                Colors.transparent,
-                              ],
-                              stops: [0.0, 0.015, 0.985, 1.0],
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.dstIn,
-                          child: TextField(
-                            controller: _controller.expressionController,
-                            scrollController: _controller.scrollController,
-                            readOnly: true,
-                            showCursor: true,
-                            autofocus: true,
-                            cursorColor: colorScheme.primaryContainer,
-                            textAlign: TextAlign.right,
-                            maxLines: 1,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: textTheme.bodyMedium?.copyWith(
-                              fontSize: CalculatorConstants.fontHuge,
-                            ),
-                          ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: CalculatorConstants.gridPadding * 1.5,
+                          vertical: CalculatorConstants.gridPadding / 2,
                         ),
-                        const SizedBox(height: 8.0),
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              _controller.answer,
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontSize: CalculatorConstants.fontSmall,
-                                color: colorScheme.secondary,
+                        alignment: Alignment.bottomRight,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (Rect bounds) {
+                                return const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.white,
+                                    Colors.white,
+                                    Colors.transparent,
+                                  ],
+                                  stops: [0.0, 0.015, 0.985, 1.0],
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.dstIn,
+                              child: TextField(
+                                controller: _controller.expressionController,
+                                scrollController: _controller.scrollController,
+                                readOnly: true,
+                                showCursor: true,
+                                autofocus: true,
+                                cursorColor: colorScheme.primaryContainer,
+                                textAlign: TextAlign.right,
+                                maxLines: 1,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontSize: CalculatorConstants.fontHuge,
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 8.0),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  _controller.answer,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontSize: CalculatorConstants.fontSmall,
+                                    color: colorScheme.primaryContainer,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: CalculatorConstants.gridPadding / 2,
+                        child: IconButton(
+                          iconSize: 28,
+                          splashRadius: 24,
+                          icon: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) {
+                              return RotationTransition(
+                                turns: child.key == const ValueKey('close')
+                                    ? Tween<double>(
+                                        begin: -0.5,
+                                        end: 0,
+                                      ).animate(animation)
+                                    : Tween<double>(
+                                        begin: 0.5,
+                                        end: 0,
+                                      ).animate(animation),
+                                child: FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: _controller.isHistoryVisible
+                                ? Icon(
+                                    Icons.close,
+                                    key: const ValueKey('close'),
+                                    color: colorScheme.tertiary,
+                                  )
+                                : Icon(
+                                    Icons.history,
+                                    key: const ValueKey('history'),
+                                    color: colorScheme.tertiary,
+                                  ),
+                          ),
+                          onPressed: _controller.toggleHistory,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -178,7 +223,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   flex: 6,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final int activeRows = _controller.isExpanded
+                      final int activeRows =
+                          (_controller.isExpanded ||
+                              _controller.isHistoryVisible)
                           ? CalculatorConstants.expandedRows
                           : CalculatorConstants.standardRows;
 
@@ -198,76 +245,119 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           availableWidth / CalculatorConstants.maxColumns;
                       final double buttonHeight = availableHeight / activeRows;
 
-                      return Container(
-                        padding: const EdgeInsets.all(
-                          CalculatorConstants.gridPadding,
-                        ),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: CalculatorConstants.layout.map((keyData) {
-                            final int currentRow = _controller.isExpanded
-                                ? keyData.row
-                                : keyData.row - 2;
+                      final double panelWidth =
+                          (buttonWidth * 3) +
+                          (CalculatorConstants.buttonSpacing * 2);
 
-                            final bool isVisible =
-                                _controller.isExpanded ||
-                                !keyData.isExpandedOnly;
+                      return ClipRect(
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                            CalculatorConstants.gridPadding,
+                          ),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              ...CalculatorConstants.layout.map((keyData) {
+                                int currentRow =
+                                    (_controller.isExpanded ||
+                                        _controller.isHistoryVisible)
+                                    ? keyData.row
+                                    : keyData.row - 2;
+                                int currentCol = keyData.col;
+                                bool isVisible =
+                                    _controller.isExpanded ||
+                                    !keyData.isExpandedOnly;
 
-                            final double leftPos =
-                                keyData.col *
-                                (buttonWidth +
-                                    CalculatorConstants.buttonSpacing);
-                            final double topPos =
-                                currentRow *
-                                (buttonHeight +
-                                    CalculatorConstants.buttonSpacing);
+                                if (_controller.isHistoryVisible) {
+                                  if (keyData.label == '⌫') {
+                                    currentCol = 3;
+                                    currentRow = 0;
+                                    isVisible = true;
+                                  } else if (keyData.label == '%') {
+                                    currentCol = 3;
+                                    currentRow = 1;
+                                    isVisible = true;
+                                  } else if (keyData.col == 3 &&
+                                      !keyData.isExpandedOnly) {
+                                    isVisible = true;
+                                  } else {
+                                    isVisible = false;
+                                  }
+                                }
 
-                            IconData? icon;
-                            if (keyData.label == 'EXP') {
-                              icon = _controller.isExpanded
-                                  ? Icons.unfold_less
-                                  : Icons.unfold_more;
-                            }
+                                final double leftPos =
+                                    currentCol *
+                                    (buttonWidth +
+                                        CalculatorConstants.buttonSpacing);
+                                final double topPos =
+                                    currentRow *
+                                    (buttonHeight +
+                                        CalculatorConstants.buttonSpacing);
 
-                            return AnimatedPositioned(
-                              duration: const Duration(milliseconds: 350),
-                              curve: Curves.easeInOutBack,
-                              left: leftPos,
-                              top: topPos,
-                              width: buttonWidth,
-                              height: buttonHeight,
-                              child: AnimatedOpacity(
-                                duration: const Duration(milliseconds: 200),
-                                opacity: isVisible ? 1.0 : 0.0,
-                                child: IgnorePointer(
-                                  ignoring: !isVisible,
-                                  child: CalculatorButton(
-                                    label: keyData.label == 'EXP'
-                                        ? null
-                                        : keyData.label,
-                                    icon: icon,
-                                    backgroundColor: _getBackgroundColor(
-                                      keyData.label,
-                                      colorScheme,
+                                IconData? icon;
+                                if (keyData.label == 'EXP') {
+                                  icon = _controller.isExpanded
+                                      ? Icons.unfold_less
+                                      : Icons.unfold_more;
+                                }
+
+                                return AnimatedPositioned(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                  left: leftPos,
+                                  top: topPos,
+                                  width: buttonWidth,
+                                  height: buttonHeight,
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 150),
+                                    opacity: isVisible ? 1.0 : 0.0,
+                                    child: IgnorePointer(
+                                      ignoring: !isVisible,
+                                      child: CalculatorButton(
+                                        label: keyData.label == 'EXP'
+                                            ? null
+                                            : keyData.label,
+                                        icon: icon,
+                                        backgroundColor: _getBackgroundColor(
+                                          keyData.label,
+                                          colorScheme,
+                                        ),
+                                        textColor: _getTextColor(
+                                          keyData.label,
+                                          colorScheme,
+                                        ),
+                                        fontSize: _getFontSize(keyData.label),
+                                        fontWeight: _getFontWeight(
+                                          keyData.label,
+                                        ),
+                                        onTap: () =>
+                                            _controller.handleButtonTap(
+                                              keyData.label,
+                                              keyData.value,
+                                            ),
+                                        onLongPress: keyData.label == '⌫'
+                                            ? _controller
+                                                  .handleBackspaceLongPress
+                                            : null,
+                                      ),
                                     ),
-                                    textColor: _getTextColor(
-                                      keyData.label,
-                                      colorScheme,
-                                    ),
-                                    fontSize: _getFontSize(keyData.label),
-                                    fontWeight: _getFontWeight(keyData.label),
-                                    onTap: () => _controller.handleButtonTap(
-                                      keyData.label,
-                                      keyData.value,
-                                    ),
-                                    onLongPress: keyData.label == '⌫'
-                                        ? _controller.handleBackspaceLongPress
-                                        : null,
                                   ),
-                                ),
+                                );
+                              }),
+                              AnimatedPositioned(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                                top: 0,
+                                bottom: 0,
+                                left: _controller.isHistoryVisible
+                                    ? 0
+                                    : -(panelWidth +
+                                          CalculatorConstants.gridPadding * 2),
+                                width: panelWidth,
+                                child: HistoryPanel(controller: _controller),
                               ),
-                            );
-                          }).toList(),
+                            ],
+                          ),
                         ),
                       );
                     },

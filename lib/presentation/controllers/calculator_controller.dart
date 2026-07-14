@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
+import '../../domain/models/history_entry.dart';
 
 class CalculatorController extends ChangeNotifier {
   final CalculatorService _calculatorService;
@@ -11,6 +12,9 @@ class CalculatorController extends ChangeNotifier {
 
   String answer = '';
   bool isExpanded = false;
+
+  final List<HistoryEntry> history = [];
+  bool isHistoryVisible = false;
 
   CalculatorController(this._calculatorService);
 
@@ -125,17 +129,29 @@ class CalculatorController extends ChangeNotifier {
     final text = expressionController.text;
     if (text.isEmpty) return;
 
-    if (answer.isEmpty && double.tryParse(text) == null) {
+    // Do not evaluate or save if the input is just a single bare number
+    if (double.tryParse(text) != null) return;
+
+    if (answer.isEmpty) {
       answer = 'Invalid Expression';
+      notifyListeners();
       return;
     }
 
     if (answer != 'Undefined' && answer != 'Invalid Expression') {
+      history.insert(0, HistoryEntry(expression: text, answer: answer));
+
+      // Explicitly remove the oldest item at the very end of the list
+      if (history.length > 15) {
+        history.removeAt(history.length - 1);
+      }
+
       expressionController.text = answer;
       expressionController.selection = TextSelection.collapsed(
         offset: answer.length,
       );
       answer = '';
+      notifyListeners();
     }
   }
 
@@ -162,5 +178,24 @@ class CalculatorController extends ChangeNotifier {
     } else {
       answer = '';
     }
+  }
+
+  void toggleHistory() {
+    isHistoryVisible = !isHistoryVisible;
+    notifyListeners();
+  }
+
+  void clearHistory() {
+    history.clear();
+    notifyListeners();
+  }
+
+  void pasteFromHistory(String pastAnswer) {
+    if (pastAnswer == 'Undefined' || pastAnswer == 'Invalid Expression') return;
+
+    _handleInput(pastAnswer);
+    _evaluateCurrentExpression();
+    notifyListeners();
+    _scrollToCursor();
   }
 }
