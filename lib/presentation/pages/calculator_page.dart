@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
+import '../../data/repositories/history_repository.dart';
 import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
 import '../widgets/history_panel.dart';
@@ -18,7 +19,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
   @override
   void initState() {
     super.initState();
-    _controller = CalculatorController(CalculatorService());
+    _controller = CalculatorController(
+      CalculatorService(),
+      HistoryRepository(),
+    );
   }
 
   @override

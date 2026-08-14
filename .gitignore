@@ -48,5 +48,3 @@ app.*.map.json
 generate_context.py
 workspace_context.md
 spec.md
-log.md
-rc_prompt.md

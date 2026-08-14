@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../../domain/models/history_entry.dart';
+import '../../data/repositories/history_repository.dart';
 
 class CalculatorController extends ChangeNotifier {
   final CalculatorService _calculatorService;
+  final HistoryRepository _historyRepository;
 
   final TextEditingController expressionController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -13,10 +15,17 @@ class CalculatorController extends ChangeNotifier {
   String answer = '';
   bool isExpanded = false;
 
-  final List<HistoryEntry> history = [];
+  List<HistoryEntry> history = [];
   bool isHistoryVisible = false;
 
-  CalculatorController(this._calculatorService);
+  CalculatorController(this._calculatorService, this._historyRepository) {
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    history = await _historyRepository.loadHistory();
+    notifyListeners();
+  }
 
   @override
   void dispose() {
@@ -129,7 +138,6 @@ class CalculatorController extends ChangeNotifier {
     final text = expressionController.text;
     if (text.isEmpty) return;
 
-    // Do not evaluate or save if the input is just a single bare number
     if (double.tryParse(text) != null) return;
 
     if (answer.isEmpty) {
@@ -141,10 +149,11 @@ class CalculatorController extends ChangeNotifier {
     if (answer != 'Undefined' && answer != 'Invalid Expression') {
       history.insert(0, HistoryEntry(expression: text, answer: answer));
 
-      // Explicitly remove the oldest item at the very end of the list
       if (history.length > 15) {
         history.removeAt(history.length - 1);
       }
+
+      _historyRepository.saveHistory(history);
 
       expressionController.text = answer;
       expressionController.selection = TextSelection.collapsed(
@@ -187,6 +196,7 @@ class CalculatorController extends ChangeNotifier {
 
   void clearHistory() {
     history.clear();
+    _historyRepository.saveHistory(history);
     notifyListeners();
   }
 
