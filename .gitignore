@@ -1,5 +1,4 @@
 # Miscellaneous
-.env
 *.class
 *.log
 *.pyc
@@ -44,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Project Overview and the script that generates it
+generate_context.py
+workspace_context.md
+spec.md
