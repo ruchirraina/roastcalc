@@ -1,6 +1,28 @@
+const ipTracker = new Map();
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
+    const ip = req.headers['x-forwarded-for'] || 'unknown';
+    const now = Date.now();
+    const timeWindow = 300000; // 5 minutes
+    const limit = 5;
+
+    const requestData = ipTracker.get(ip) || { count: 0, startTime: now };
+
+    if (now - requestData.startTime > timeWindow) {
+        requestData.count = 1;
+        requestData.startTime = now;
+    } else {
+        requestData.count++;
+    }
+
+    ipTracker.set(ip, requestData);
+
+    if (requestData.count > limit) {
+        return res.status(429).json({ error: 'Too Many Requests' });
     }
 
     const { historyText } = req.body;
@@ -10,7 +32,6 @@ export default async function handler(req, res) {
     }
 
     const systemPrompt = 'You are a laid-back, funny "chill coworker". Review the following math calculations the user just performed. Give a short, witty, and lighthearted text roast about their math habits. Keep it casual, brief, and do not use complex formatting. Do not be overly mean.';
-
     const fullPrompt = `${systemPrompt}\n\nUser History:\n${historyText}`;
 
     try {
