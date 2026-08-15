@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../../data/repositories/history_repository.dart';
+import '../../data/services/gemini_service.dart';
 import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
 import '../widgets/history_panel.dart';
@@ -22,6 +23,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     _controller = CalculatorController(
       CalculatorService(),
       HistoryRepository(),
+      GeminiService(),
     );
   }
 
@@ -220,7 +222,23 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: const Center(child: Text('Roast Area Placeholder')),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          child: Text(
+                            _controller.currentRoast,
+                            key: ValueKey(_controller.currentRoast),
+                            textAlign: TextAlign.center,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.tertiary,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(

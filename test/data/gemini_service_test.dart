@@ -11,7 +11,7 @@ void main() {
       const HistoryEntry(expression: '100 / 0', answer: 'Undefined'),
     ];
 
-    final result = await service.fetchRoast(dummyHistory, bypassCooldown: true);
+    final result = await service.fetchRoast(dummyHistory);
 
     debugPrint('--- VERCEL ROAST TEST RESULT ---');
     debugPrint(result);

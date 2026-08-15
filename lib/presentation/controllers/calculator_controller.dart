@@ -1,25 +1,39 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../domain/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
+import '../../core/constants/roast_fallbacks.dart';
 import '../../domain/models/history_entry.dart';
 import '../../data/repositories/history_repository.dart';
+import '../../data/services/gemini_service.dart';
 
 class CalculatorController extends ChangeNotifier {
   final CalculatorService _calculatorService;
   final HistoryRepository _historyRepository;
+  final GeminiService _geminiService;
 
   final TextEditingController expressionController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  Timer? _roastTimer;
 
   String answer = '';
   bool isExpanded = false;
 
   List<HistoryEntry> history = [];
   bool isHistoryVisible = false;
+  String currentRoast = '';
 
-  CalculatorController(this._calculatorService, this._historyRepository) {
+  CalculatorController(
+    this._calculatorService,
+    this._historyRepository,
+    this._geminiService,
+  ) {
+    currentRoast = RoastFallbacks
+        .greetings[Random().nextInt(RoastFallbacks.greetings.length)];
     _loadHistory();
+    _startRoastTimer();
   }
 
   Future<void> _loadHistory() async {
@@ -27,10 +41,21 @@ class CalculatorController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _startRoastTimer() {
+    _roastTimer = Timer.periodic(const Duration(minutes: 5), (_) async {
+      final roast = await _geminiService.fetchRoast(history);
+      if (roast != null) {
+        currentRoast = roast;
+        notifyListeners();
+      }
+    });
+  }
+
   @override
   void dispose() {
     expressionController.dispose();
     scrollController.dispose();
+    _roastTimer?.cancel();
     super.dispose();
   }
 
