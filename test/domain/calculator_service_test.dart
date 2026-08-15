@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:roastcalc/domain/calculator_service.dart';
+import 'package:roastcalc/domain/services/calculator_service.dart';
 
 void main() {
   late CalculatorService calculator;

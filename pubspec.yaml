@@ -1,7 +1,7 @@
 name: roastcalc
 description: "A cross-platform calculator application featuring AI-generated roasts and math insights."
 publish_to: 'none'
-version: 0.1.10+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.12.2
@@ -12,11 +12,20 @@ dependencies:
   math_expressions: ^3.2.0
   shared_preferences: ^2.5.5
   http: ^1.6.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon.png"
+  adaaptive_icon_foreground: "assets/icons/icon_foreground.png"
+  adaptive_icon_background: "assets/icons/icon_background.png"
+  adaptive_icon_monochrome: "assets/icons/icon_monochrome.png"
 
 flutter:
   uses-material-design: true

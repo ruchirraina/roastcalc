@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../domain/calculator_service.dart';
+import '../../domain/services/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../../core/constants/roast_fallbacks.dart';
 import '../../domain/models/history_entry.dart';

@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing historyText' });
     }
 
-    const systemPrompt = 'You are a laid-back, funny "chill coworker". Review the following math calculations the user just performed. Give a short, witty, and lighthearted text roast about their math habits. Keep it casual, brief, and do not use complex formatting. Do not be overly mean.';
+    const systemPrompt = 'You are a laid-back, funny "chill coworker". Review the following math calculations the user just performed. Give a punchy, witty, and lighthearted text roast about their math habits. STRICT RULE: You are limited to exactly ONE short sentence. Do not be overly mean.';
     const fullPrompt = `${systemPrompt}\n\nUser History:\n${historyText}`;
 
     try {
@@ -46,7 +46,10 @@ export default async function handler(req, res) {
                     {
                         parts: [{ text: fullPrompt }]
                     }
-                ]
+                ],
+                generationConfig: {
+                    maxOutputTokens: 40
+                }
             }),
         });
 

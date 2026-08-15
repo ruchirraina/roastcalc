@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../domain/calculator_service.dart';
+import '../../domain/services/calculator_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../../data/repositories/history_repository.dart';
 import '../../data/services/gemini_service.dart';
 import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
 import '../widgets/history_panel.dart';
+import '../widgets/roast_panel.dart';
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage({super.key});
@@ -193,12 +194,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                 ? Icon(
                                     Icons.close,
                                     key: const ValueKey('close'),
-                                    color: colorScheme.tertiary,
+                                    color: colorScheme.onSurface,
                                   )
                                 : Icon(
                                     Icons.history,
                                     key: const ValueKey('history'),
-                                    color: colorScheme.tertiary,
+                                    color: colorScheme.onSurface,
                                   ),
                           ),
                           onPressed: _controller.toggleHistory,
@@ -209,37 +210,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 ),
                 Expanded(
                   flex: 2,
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: CalculatorConstants.gridPadding,
-                      vertical: CalculatorConstants.gridPadding / 2,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: colorScheme.primary,
-                        width: CalculatorConstants.borderWidth,
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          child: Text(
-                            _controller.currentRoast,
-                            key: ValueKey(_controller.currentRoast),
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.tertiary,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: RoastPanel(currentRoast: _controller.currentRoast),
                 ),
                 Expanded(
                   flex: 6,
