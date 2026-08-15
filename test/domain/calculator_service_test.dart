@@ -73,5 +73,10 @@ void main() {
       expect(calculator.evaluateExpression(''), isNull);
       expect(calculator.evaluateExpression('    '), isNull);
     });
+
+    test('Returns Undefined for decimal factorials', () {
+      expect(calculator.evaluateExpression('2.5!'), 'Undefined');
+      expect(calculator.evaluateExpression('.5!'), 'Undefined');
+    });
   });
 }

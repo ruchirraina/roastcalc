@@ -16,6 +16,7 @@ class RoastCalcApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       home: const CalculatorPage(),
     );
   }

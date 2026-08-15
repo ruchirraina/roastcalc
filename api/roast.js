@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     const ip = req.headers['x-forwarded-for'] || 'unknown';
     const now = Date.now();
-    const timeWindow = 300000; // 5 minutes
+    const timeWindow = 60000; // 1 minute
     const limit = 5;
 
     const requestData = ipTracker.get(ip) || { count: 0, startTime: now };

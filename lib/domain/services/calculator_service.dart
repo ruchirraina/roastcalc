@@ -20,6 +20,11 @@ class CalculatorService {
         (match) => '${match[1]}0.${match[2]}',
       );
 
+      // Block visual decimal factorials
+      if (RegExp(r'\.\d*\s*!').hasMatch(processed)) {
+        return 'Undefined';
+      }
+
       // Implicit Multiplication: Number before parenthesis (e.g., 3(2) -> 3*(2))
       processed = processed.replaceAllMapped(
         RegExp(r'(\d)\s*\('),

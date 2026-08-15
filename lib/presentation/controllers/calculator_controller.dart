@@ -42,7 +42,7 @@ class CalculatorController extends ChangeNotifier {
   }
 
   void _startRoastTimer() {
-    _roastTimer = Timer.periodic(const Duration(minutes: 5), (_) async {
+    _roastTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
       final roast = await _geminiService.fetchRoast(history);
       if (roast != null) {
         currentRoast = roast;
