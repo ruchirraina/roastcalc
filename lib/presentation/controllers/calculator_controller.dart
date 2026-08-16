@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../domain/services/calculator_service.dart';
+import '../../data/repositories/history_repository.dart';
+import '../../data/services/gemini_service.dart';
 import '../../core/constants/calculator_constants.dart';
 import '../../core/constants/roast_fallbacks.dart';
 import '../../domain/models/history_entry.dart';
-import '../../data/repositories/history_repository.dart';
-import '../../data/services/gemini_service.dart';
 
 class CalculatorController extends ChangeNotifier {
   final CalculatorService _calculatorService;
@@ -44,11 +43,8 @@ class CalculatorController extends ChangeNotifier {
   void _startRoastTimer() {
     _roastTimer?.cancel();
     _roastTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
-      final roast = await _geminiService.fetchRoast(history);
-      if (roast != null) {
-        currentRoast = roast;
-        notifyListeners();
-      }
+      currentRoast = await _geminiService.fetchRoast(history);
+      notifyListeners();
     });
   }
 
@@ -118,10 +114,6 @@ class CalculatorController extends ChangeNotifier {
   }
 
   void handleButtonTap(String label, String value) {
-    if (label == '=' || label == 'AC') {
-      HapticFeedback.vibrate();
-    }
-
     if (label == 'AC') {
       _clearState();
     } else if (label == '⌫') {
@@ -143,9 +135,9 @@ class CalculatorController extends ChangeNotifier {
   }
 
   void handleBackspaceLongPress() {
-    HapticFeedback.vibrate();
     _clearState();
     notifyListeners();
+    _scrollToCursor();
   }
 
   void _clearState() {

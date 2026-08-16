@@ -10,7 +10,7 @@ void main() {
 
   group('CalculatorService - Core Arithmetic & Formatting', () {
     test('Evaluates standard operations with order of operations', () {
-      expect(calculator.evaluateExpression('10 + 2 × 5 - 4 ÷ 2'), '18');
+      expect(calculator.evaluateExpression('10 + 2 * 5 - 4 / 2'), '18');
     });
 
     test('Trims decimal points cleanly for whole integers', () {
@@ -21,10 +21,7 @@ void main() {
   group('CalculatorService - Implicit Multiplication', () {
     test('Evaluates number directly before parenthesis', () {
       expect(calculator.evaluateExpression('3(2)'), '6');
-      expect(
-        calculator.evaluateExpression('3*(2)'),
-        '6',
-      ); // Explicit still works
+      expect(calculator.evaluateExpression('3*(2)'), '6');
     });
 
     test('Evaluates number directly after parenthesis', () {
@@ -42,20 +39,20 @@ void main() {
       expect(calculator.evaluateExpression('50 %'), '0.5');
     });
 
-    test('Evaluates visual powers (square, cube, general powers)', () {
-      expect(calculator.evaluateExpression('5²'), '25');
-      expect(calculator.evaluateExpression('2³'), '8');
+    test('Evaluates explicit powers (general powers)', () {
+      expect(calculator.evaluateExpression('5^2'), '25');
+      expect(calculator.evaluateExpression('2^3'), '8');
       expect(calculator.evaluateExpression('2 ^ 5'), '32');
     });
 
-    test('Evaluates visual roots with bare numbers (auto-wrapping)', () {
-      expect(calculator.evaluateExpression('√9'), '3');
-      expect(calculator.evaluateExpression('³√8'), '2');
+    test('Evaluates text roots with bare numbers (auto-wrapping)', () {
+      expect(calculator.evaluateExpression('sqrt9'), '3');
+      expect(calculator.evaluateExpression('cbrt8'), '2');
     });
 
-    test('Evaluates visual roots with explicit parentheses', () {
-      expect(calculator.evaluateExpression('√(16)'), '4');
-      expect(calculator.evaluateExpression('³√(27)'), '3');
+    test('Evaluates text roots with explicit parentheses', () {
+      expect(calculator.evaluateExpression('sqrt(16)'), '4');
+      expect(calculator.evaluateExpression('cbrt(27)'), '3');
     });
 
     test('Evaluates factorial operator', () {

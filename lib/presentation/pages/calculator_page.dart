@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../domain/services/calculator_service.dart';
-import '../../core/constants/calculator_constants.dart';
 import '../../data/repositories/history_repository.dart';
 import '../../data/services/gemini_service.dart';
+import '../../core/constants/calculator_constants.dart';
+import '../constants/calculator_layout.dart';
 import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
 import '../widgets/history_panel.dart';
@@ -276,7 +278,7 @@ class _CalculatorPageState extends State<CalculatorPage>
                           child: Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              ...CalculatorConstants.layout.map((keyData) {
+                              ...CalculatorLayout.keys.map((keyData) {
                                 int currentRow =
                                     (_controller.isExpanded ||
                                         _controller.isHistoryVisible)
@@ -288,19 +290,12 @@ class _CalculatorPageState extends State<CalculatorPage>
                                     !keyData.isExpandedOnly;
 
                                 if (_controller.isHistoryVisible) {
-                                  if (keyData.label == '⌫') {
-                                    currentCol = 3;
-                                    currentRow = 0;
-                                    isVisible = true;
-                                  } else if (keyData.label == '%') {
-                                    currentCol = 3;
-                                    currentRow = 1;
-                                    isVisible = true;
-                                  } else if (keyData.col == 3 &&
-                                      !keyData.isExpandedOnly) {
-                                    isVisible = true;
-                                  } else {
-                                    isVisible = false;
+                                  isVisible = keyData.isVisibleInHistory;
+                                  if (isVisible) {
+                                    currentCol =
+                                        keyData.historyCol ?? keyData.col;
+                                    currentRow =
+                                        keyData.historyRow ?? keyData.row;
                                   }
                                 }
 
@@ -350,14 +345,22 @@ class _CalculatorPageState extends State<CalculatorPage>
                                           fontWeight: _getFontWeight(
                                             keyData.label,
                                           ),
-                                          onTap: () =>
-                                              _controller.handleButtonTap(
-                                                keyData.label,
-                                                keyData.value,
-                                              ),
+                                          onTap: () {
+                                            if (keyData.label == '=' ||
+                                                keyData.label == 'AC') {
+                                              HapticFeedback.vibrate();
+                                            }
+                                            _controller.handleButtonTap(
+                                              keyData.label,
+                                              keyData.value,
+                                            );
+                                          },
                                           onLongPress: keyData.label == '⌫'
-                                              ? _controller
-                                                    .handleBackspaceLongPress
+                                              ? () {
+                                                  HapticFeedback.vibrate();
+                                                  _controller
+                                                      .handleBackspaceLongPress();
+                                                }
                                               : null,
                                         ),
                                       ),

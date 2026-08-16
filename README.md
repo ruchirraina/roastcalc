@@ -1,6 +1,6 @@
 # RoastCalc
 
-A cross-platform calculator application built with Flutter. Version 1.0.0.
+A cross-platform calculator application built with Flutter.
 
 RoastCalc functions as a standard calculator with a distinct retro aesthetic. It integrates an AI persona that acts as a chill coworker. This AI silently monitors your calculation history and generates a short, witty text roast every five minutes. 
 
