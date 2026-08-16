@@ -15,7 +15,7 @@ class HistoryPanel extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(CalculatorConstants.borderRadius),
         border: Border.all(
           color: colorScheme.primary,
           width: CalculatorConstants.borderWidth,
@@ -32,7 +32,7 @@ class HistoryPanel extends StatelessWidget {
         children: [
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
+              duration: CalculatorConstants.animSlow,
               child: controller.history.isEmpty
                   ? Center(
                       key: const ValueKey('empty'),
@@ -56,7 +56,9 @@ class HistoryPanel extends StatelessWidget {
                         return InkWell(
                           onTap: () =>
                               controller.pasteFromHistory(entry.answer),
-                          borderRadius: BorderRadius.circular(8.0),
+                          borderRadius: BorderRadius.circular(
+                            CalculatorConstants.borderRadiusSmall,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
@@ -91,7 +93,7 @@ class HistoryPanel extends StatelessWidget {
             ),
           ),
           AnimatedSize(
-            duration: const Duration(milliseconds: 500),
+            duration: CalculatorConstants.animPanel,
             curve: Curves.easeInOutCubic,
             child: controller.history.isNotEmpty
                 ? Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/calculator_constants.dart';
 
 class CalculatorButton extends StatelessWidget {
   final String? label;
@@ -34,7 +35,7 @@ class CalculatorButton extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(CalculatorConstants.borderRadius),
         boxShadow: [
           BoxShadow(
             color: shadowColor,
@@ -45,7 +46,7 @@ class CalculatorButton extends StatelessWidget {
       ),
       child: Material(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(CalculatorConstants.borderRadius),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,

@@ -189,7 +189,7 @@ class _CalculatorPageState extends State<CalculatorPage>
                           iconSize: 28,
                           splashRadius: 24,
                           icon: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
+                            duration: CalculatorConstants.animNormal,
                             transitionBuilder: (child, animation) {
                               return RotationTransition(
                                 turns: child.key == const ValueKey('close')
@@ -316,14 +316,14 @@ class _CalculatorPageState extends State<CalculatorPage>
                                 }
 
                                 return AnimatedPositioned(
-                                  duration: const Duration(milliseconds: 300),
+                                  duration: CalculatorConstants.animNormal,
                                   curve: Curves.easeOut,
                                   left: leftPos,
                                   top: topPos,
                                   width: buttonWidth,
                                   height: buttonHeight,
                                   child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 150),
+                                    duration: CalculatorConstants.animFast,
                                     opacity: isVisible ? 1.0 : 0.0,
                                     child: IgnorePointer(
                                       ignoring: !isVisible,
@@ -369,7 +369,7 @@ class _CalculatorPageState extends State<CalculatorPage>
                                 );
                               }),
                               AnimatedPositioned(
-                                duration: const Duration(milliseconds: 300),
+                                duration: CalculatorConstants.animNormal,
                                 curve: Curves.easeOut,
                                 top: 0,
                                 bottom: 0,

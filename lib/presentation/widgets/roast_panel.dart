@@ -28,7 +28,7 @@ class RoastPanel extends StatelessWidget {
           color: colorScheme.primary,
           width: CalculatorConstants.borderWidth,
         ),
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(CalculatorConstants.borderRadius),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,7 +37,7 @@ class RoastPanel extends StatelessWidget {
           const SizedBox(width: 12.0),
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
+              duration: CalculatorConstants.animPanel,
               switchInCurve: const Interval(0.5, 1.0, curve: Curves.easeOut),
               switchOutCurve: const Interval(0.5, 1.0, curve: Curves.easeIn),
               transitionBuilder: (Widget child, Animation<double> animation) {
@@ -86,7 +86,9 @@ class _AnimatedFireButtonState extends State<_AnimatedFireButton>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(
+        seconds: 2,
+      ), // Kept local: Specific to fire pulse
     )..repeat(reverse: true);
 
     _scaleAnimation = Tween<double>(

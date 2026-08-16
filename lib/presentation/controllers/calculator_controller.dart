@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../core/constants/app_config.dart';
 import '../../domain/services/calculator_service.dart';
 import '../../data/repositories/history_repository.dart';
 import '../../data/services/gemini_service.dart';
@@ -42,7 +43,7 @@ class CalculatorController extends ChangeNotifier {
 
   void _startRoastTimer() {
     _roastTimer?.cancel();
-    _roastTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
+    _roastTimer = Timer.periodic(AppConfig.roastInterval, (_) async {
       currentRoast = await _geminiService.fetchRoast(history);
       notifyListeners();
     });
@@ -95,18 +96,23 @@ class CalculatorController extends ChangeNotifier {
       final double currentScrollOffset = scrollController.offset;
       final double maxScroll = scrollController.position.maxScrollExtent;
 
-      const double padding = 20.0;
+      const double scrollEdgePadding = 20.0;
 
-      if (cursorPixelPosition > currentScrollOffset + viewportWidth - padding) {
+      if (cursorPixelPosition >
+          currentScrollOffset + viewportWidth - scrollEdgePadding) {
         scrollController.animateTo(
-          (cursorPixelPosition - viewportWidth + padding).clamp(0.0, maxScroll),
-          duration: const Duration(milliseconds: 150),
+          (cursorPixelPosition - viewportWidth + scrollEdgePadding).clamp(
+            0.0,
+            maxScroll,
+          ),
+          duration: CalculatorConstants.animFast,
           curve: Curves.easeOut,
         );
-      } else if (cursorPixelPosition < currentScrollOffset + padding) {
+      } else if (cursorPixelPosition <
+          currentScrollOffset + scrollEdgePadding) {
         scrollController.animateTo(
-          (cursorPixelPosition - padding).clamp(0.0, maxScroll),
-          duration: const Duration(milliseconds: 150),
+          (cursorPixelPosition - scrollEdgePadding).clamp(0.0, maxScroll),
+          duration: CalculatorConstants.animFast,
           curve: Curves.easeOut,
         );
       }
@@ -178,7 +184,7 @@ class CalculatorController extends ChangeNotifier {
     if (answer != 'Undefined' && answer != 'Invalid Expression') {
       history.insert(0, HistoryEntry(expression: text, answer: answer));
 
-      if (history.length > 15) {
+      if (history.length > AppConfig.maxHistoryEntries) {
         history.removeAt(history.length - 1);
       }
 

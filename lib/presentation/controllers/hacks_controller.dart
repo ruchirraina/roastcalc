@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../core/constants/app_config.dart';
 import '../../data/repositories/hacks_repository.dart';
 import '../../data/repositories/history_repository.dart';
 import '../../data/services/gemini_service.dart';
@@ -53,7 +54,7 @@ class HacksController extends ChangeNotifier {
 
     if (lastGenTime != null) {
       final int elapsed = DateTime.now().millisecondsSinceEpoch - lastGenTime;
-      const int cooldownMs = 300000;
+      final int cooldownMs = AppConfig.hacksCooldown.inMilliseconds;
 
       if (elapsed < cooldownMs) {
         _startTimer(cooldownMs - elapsed);
@@ -93,7 +94,7 @@ class HacksController extends ChangeNotifier {
 
     final futures = await Future.wait([
       _geminiService.fetchHackChips(history),
-      Future.delayed(const Duration(milliseconds: 500)),
+      Future.delayed(AppConfig.minimumLoadingDelay),
     ]);
 
     final fetchedChips = futures[0] as List<String>?;
@@ -113,14 +114,14 @@ class HacksController extends ChangeNotifier {
 
     final futures = await Future.wait([
       _geminiService.fetchHackExplanation(history, topic),
-      Future.delayed(const Duration(milliseconds: 500)),
+      Future.delayed(AppConfig.minimumLoadingDelay),
     ]);
 
     final fetchedExplanation = futures[0] as String?;
 
     if (fetchedExplanation != null) {
       await _hacksRepository.startCooldown();
-      _startTimer(300000);
+      _startTimer(AppConfig.hacksCooldown.inMilliseconds);
 
       explanation = fetchedExplanation;
       currentState = HacksState.showingExplanation;

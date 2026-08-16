@@ -40,11 +40,11 @@ Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
 
 Output Requirements:
-* Each topic title must be strictly 3 to 5 words long.
-* Output strictly a raw JSON array of 3 strings. Example: ["The 15% Tip Trick", "Squaring Numbers Ending In Five", "Why Zero Factorial Equals One"]
+* Each topic title must be strictly 2 to 4 words long. Keep them short so they do not get cut off on mobile screens.
+* Output strictly a raw JSON array of 3 strings. Example: ["The 15% Tip Trick", "Fast Square Roots", "Zero Factorial Rule"]
 
 What NOT to do:
-* Do not write topic titles under 3 words or over 5 words.
+* Do not write topic titles over 4 words.
 * Do not suggest topics outside the supported operations (no calculus, trigonometry, logarithms, imaginary numbers, or advanced proofs).
 * Do not output Markdown code blocks (no \`\`\`json), greetings, or extra text.`;
         } else {
@@ -54,11 +54,11 @@ Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
 
 Output Requirements:
-* Each topic title must be strictly 3 to 5 words long.
-* Output strictly a raw JSON array of 3 strings. Example: ["Ten Percent Mental Math Shortcut", "The Percentage Swapping Rule", "Quick Square Root Estimates"]
+* Each topic title must be strictly 2 to 4 words long. Keep them short so they do not get cut off on mobile screens.
+* Output strictly a raw JSON array of 3 strings. Example: ["Ten Percent Shortcut", "Percentage Swapping Rule", "Square Root Hacks"]
 
 What NOT to do:
-* Do not write topic titles under 3 words or over 5 words.
+* Do not write topic titles over 4 words.
 * Do not check, correct, or question the math in their history (all results are accurate).
 * Do not suggest topics outside the supported operations (no calculus, trigonometry, logarithms, or advanced theory).
 * Do not output Markdown code blocks or conversational text.`;
@@ -71,17 +71,17 @@ You are strictly limited to the operations supported by this calculator: additio
 
 Structure your response using clean Markdown:
 * Start the response directly with the exact topic title in bold: **${topic}**
-* Short, direct bullet points explaining the core concept, rule, or shortcut so they can understand and apply it easily.
-* A brief worked example showing the concept or trick in action.
+* Write naturally using paragraphs, headings, subheadings, and bullet points as needed to explain the core concept clearly.
+* Include a brief worked example showing the concept or trick in action.
 
 What NOT to do:
 * Do not question or critique the mathematical accuracy of their calculation history.
 * Do not drift into operations or math concepts outside the supported operations.
 * Do not change or rephrase the title on the first line; it must match "${topic}" word-for-word.
 * Do not use LaTeX syntax (no $, $$, \\frac, or backslashes). Use clean Unicode math symbols (+, -, ×, ÷, %, ^, ², ³, √, ³√, !).
+* Do not use tables, code blocks, or any ASCII/HTML/CSS diagrams.
 * Do not write conversational setup lines (no "Hey there!", "Here's a breakdown:", or "Hope this helps!").
-* Do not sound like an academic lecturer or an AI assistant.
-* Do not write long proofs or dense walls of text. Keep it relatively short, practical, and punchy.`;
+* Do not sound like an academic lecturer or an AI assistant.`;
     } else {
         return res.status(400).json({ error: 'Invalid action' });
     }

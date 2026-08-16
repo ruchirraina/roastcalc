@@ -66,7 +66,7 @@ class _HacksPageState extends State<HacksPage> {
           listenable: _controller,
           builder: (context, _) {
             return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
+              duration: CalculatorConstants.animPanel,
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
               child: _buildCurrentState(colorScheme, textTheme),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../../core/constants/api_constants.dart';
+import '../../core/constants/app_config.dart';
 import '../../core/constants/roast_fallbacks.dart';
 import '../../domain/models/history_entry.dart';
 
@@ -16,7 +17,7 @@ class GeminiService {
     }
 
     final String historyText = history
-        .take(3)
+        .take(AppConfig.roastHistoryCount)
         .map((e) => '${e.expression} = ${e.answer}')
         .join('\n');
 
@@ -27,7 +28,7 @@ class GeminiService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'historyText': historyText}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(AppConfig.apiTimeout);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -46,7 +47,7 @@ class GeminiService {
     final String historyText = history.isEmpty
         ? 'empty'
         : history
-              .take(5)
+              .take(AppConfig.hacksHistoryCount)
               .map((e) => '${e.expression} = ${e.answer}')
               .join('\n');
 
@@ -57,7 +58,7 @@ class GeminiService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'historyText': historyText, 'action': 'chips'}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(AppConfig.apiTimeout);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -80,7 +81,7 @@ class GeminiService {
     final String historyText = history.isEmpty
         ? 'empty'
         : history
-              .take(5)
+              .take(AppConfig.hacksHistoryCount)
               .map((e) => '${e.expression} = ${e.answer}')
               .join('\n');
 
@@ -95,7 +96,7 @@ class GeminiService {
               'topic': topic,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(AppConfig.apiTimeout);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);

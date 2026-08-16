@@ -30,37 +30,55 @@ class HacksExplanationView extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Center(
-                child: MarkdownBody(
-                  data: explanation,
-                  selectable: true,
-                  styleSheet: MarkdownStyleSheet(
-                    p: textTheme.bodyMedium?.copyWith(
-                      fontSize: 16.0,
-                      height: 1.5,
-                    ),
-                    strong: textTheme.bodyMedium?.copyWith(
-                      fontSize: 16.0,
-                      height: 1.5,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primaryContainer,
-                    ),
-                    em: textTheme.bodyMedium?.copyWith(
-                      fontSize: 16.0,
-                      height: 1.5,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    code: textTheme.bodyMedium?.copyWith(
-                      fontSize: 14.0,
-                      backgroundColor: colorScheme.surface,
-                      color: colorScheme.primaryContainer,
-                    ),
-                    codeblockDecoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        color: colorScheme.tertiary.withValues(alpha: 0.3),
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.white,
+                    Colors.white,
+                    Colors.transparent,
+                  ],
+                  stops: [0.0, 0.02, 0.97, 1.0],
+                ).createShader(bounds);
+              },
+              blendMode: BlendMode.dstIn,
+              child: SingleChildScrollView(
+                child: Center(
+                  child: MarkdownBody(
+                    data: explanation,
+                    selectable: true,
+                    styleSheet: MarkdownStyleSheet(
+                      p: textTheme.bodyMedium?.copyWith(
+                        fontSize: 16.0,
+                        height: 1.5,
+                      ),
+                      strong: textTheme.bodyMedium?.copyWith(
+                        fontSize: 16.0,
+                        height: 1.5,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primaryContainer,
+                      ),
+                      em: textTheme.bodyMedium?.copyWith(
+                        fontSize: 16.0,
+                        height: 1.5,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      code: textTheme.bodyMedium?.copyWith(
+                        fontSize: 14.0,
+                        backgroundColor: colorScheme.surface,
+                        color: colorScheme.primaryContainer,
+                      ),
+                      codeblockDecoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(
+                          CalculatorConstants.borderRadiusSmall,
+                        ),
+                        border: Border.all(
+                          color: colorScheme.tertiary.withValues(alpha: 0.3),
+                        ),
                       ),
                     ),
                   ),
@@ -69,76 +87,77 @@ class HacksExplanationView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16.0),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            child: remainingTime.inSeconds > 0
-                ? Container(
-                    key: const ValueKey('timer_box'),
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      border: Border.all(
-                        color: colorScheme.tertiary.withValues(alpha: 0.3),
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.hourglass_empty,
-                          color: colorScheme.secondary,
-                          size: 32.0,
-                        ),
-                        const SizedBox(width: 16.0),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Next generation available in:",
-                                style: textTheme.bodyMedium?.copyWith(
-                                  fontSize: 15.0,
-                                  color: colorScheme.onSurface,
-                                ),
+          Material(
+            color: colorScheme.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                CalculatorConstants.borderRadius,
+              ),
+              side: BorderSide(
+                color: remainingTime.inSeconds > 0
+                    ? colorScheme.tertiary.withValues(alpha: 0.3)
+                    : colorScheme.primaryContainer.withValues(alpha: 0.5),
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: remainingTime.inSeconds > 0 ? null : onRequestMore,
+              child: AnimatedContainer(
+                duration: CalculatorConstants.animSlow,
+                height: 92.0, // Kept local: Structural constraint
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                alignment: Alignment.center,
+                child: AnimatedSwitcher(
+                  duration: CalculatorConstants.animSlow,
+                  child: remainingTime.inSeconds > 0
+                      ? Row(
+                          key: const ValueKey('timer_content'),
+                          children: [
+                            Icon(
+                              Icons.hourglass_empty,
+                              color: colorScheme.secondary,
+                              size: 32.0,
+                            ),
+                            const SizedBox(width: 16.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Next generation available in:",
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      fontSize: 15.0,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    _formatDuration(remainingTime),
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.secondary,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 4.0),
-                              Text(
-                                _formatDuration(remainingTime),
-                                style: textTheme.bodyMedium?.copyWith(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.secondary,
-                                ),
-                              ),
-                            ],
+                            ),
+                          ],
+                        )
+                      : Text(
+                          "Want some more hacks?",
+                          key: const ValueKey('action_content'),
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.primaryContainer,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    key: const ValueKey('action_button'),
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      border: Border.all(
-                        color: colorScheme.primaryContainer.withValues(
-                          alpha: 0.5,
-                        ),
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: OutlinedButton(
-                      onPressed: onRequestMore,
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide.none,
-                        foregroundColor: colorScheme.primaryContainer,
-                      ),
-                      child: const Text("Want some more hacks?"),
-                    ),
-                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

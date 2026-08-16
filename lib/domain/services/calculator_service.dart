@@ -1,4 +1,5 @@
 import 'package:math_expressions/math_expressions.dart';
+import '../../core/constants/app_config.dart';
 
 class CalculatorService {
   String? evaluateExpression(String expression) {
@@ -78,10 +79,10 @@ class CalculatorService {
       if (result % 1 == 0) {
         roundedResult = result.toDouble();
       } else {
-        const double precisionFactor = 10000000000.0;
         roundedResult =
-            (result.toDouble() * precisionFactor).roundToDouble() /
-            precisionFactor;
+            (result.toDouble() * AppConfig.mathPrecisionFactor)
+                .roundToDouble() /
+            AppConfig.mathPrecisionFactor;
       }
 
       return _formatOutput(roundedResult);
