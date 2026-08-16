@@ -42,6 +42,7 @@ class CalculatorController extends ChangeNotifier {
   }
 
   void _startRoastTimer() {
+    _roastTimer?.cancel();
     _roastTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
       final roast = await _geminiService.fetchRoast(history);
       if (roast != null) {
@@ -49,6 +50,17 @@ class CalculatorController extends ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  void pauseTimer() {
+    _roastTimer?.cancel();
+    _roastTimer = null;
+  }
+
+  void resumeTimer() {
+    if (_roastTimer == null) {
+      _startRoastTimer();
+    }
   }
 
   @override

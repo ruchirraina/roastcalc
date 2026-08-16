@@ -3,8 +3,13 @@ import '../../core/constants/calculator_constants.dart';
 
 class RoastPanel extends StatelessWidget {
   final String currentRoast;
+  final VoidCallback onFireTapped;
 
-  const RoastPanel({super.key, required this.currentRoast});
+  const RoastPanel({
+    super.key,
+    required this.currentRoast,
+    required this.onFireTapped,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +33,7 @@ class RoastPanel extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            Icons.local_fire_department_outlined,
-            color: colorScheme.primaryContainer,
-            size: 24.0,
-          ),
+          _AnimatedFireButton(onTap: onFireTapped),
           const SizedBox(width: 12.0),
           Expanded(
             child: AnimatedSwitcher(
@@ -61,6 +62,61 @@ class RoastPanel extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AnimatedFireButton extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _AnimatedFireButton({required this.onTap});
+
+  @override
+  State<_AnimatedFireButton> createState() => _AnimatedFireButtonState();
+}
+
+class _AnimatedFireButtonState extends State<_AnimatedFireButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: IconButton(
+        icon: Icon(
+          Icons.local_fire_department_outlined,
+          color: colorScheme.primaryContainer,
+          size: 24.0,
+        ),
+        onPressed: widget.onTap,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 20.0,
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../controllers/calculator_controller.dart';
 import '../widgets/calculator_button.dart';
 import '../widgets/history_panel.dart';
 import '../widgets/roast_panel.dart';
+import 'hacks_page.dart';
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage({super.key});
@@ -15,12 +16,14 @@ class CalculatorPage extends StatefulWidget {
   State<CalculatorPage> createState() => _CalculatorPageState();
 }
 
-class _CalculatorPageState extends State<CalculatorPage> {
+class _CalculatorPageState extends State<CalculatorPage>
+    with WidgetsBindingObserver {
   late final CalculatorController _controller;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = CalculatorController(
       CalculatorService(),
       HistoryRepository(),
@@ -29,7 +32,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      _controller.pauseTimer();
+    } else if (state == AppLifecycleState.resumed) {
+      _controller.resumeTimer();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
@@ -210,7 +225,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 ),
                 Expanded(
                   flex: 2,
-                  child: RoastPanel(currentRoast: _controller.currentRoast),
+                  child: RoastPanel(
+                    currentRoast: _controller.currentRoast,
+                    onFireTapped: () async {
+                      _controller.pauseTimer();
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const HacksPage(),
+                        ),
+                      );
+                      _controller.resumeTimer();
+                    },
+                  ),
                 ),
                 Expanded(
                   flex: 6,
@@ -306,32 +332,34 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                     opacity: isVisible ? 1.0 : 0.0,
                                     child: IgnorePointer(
                                       ignoring: !isVisible,
-                                      child: CalculatorButton(
-                                        label: keyData.label == 'EXP'
-                                            ? null
-                                            : keyData.label,
-                                        icon: icon,
-                                        backgroundColor: _getBackgroundColor(
-                                          keyData.label,
-                                          colorScheme,
+                                      child: RepaintBoundary(
+                                        child: CalculatorButton(
+                                          label: keyData.label == 'EXP'
+                                              ? null
+                                              : keyData.label,
+                                          icon: icon,
+                                          backgroundColor: _getBackgroundColor(
+                                            keyData.label,
+                                            colorScheme,
+                                          ),
+                                          textColor: _getTextColor(
+                                            keyData.label,
+                                            colorScheme,
+                                          ),
+                                          fontSize: _getFontSize(keyData.label),
+                                          fontWeight: _getFontWeight(
+                                            keyData.label,
+                                          ),
+                                          onTap: () =>
+                                              _controller.handleButtonTap(
+                                                keyData.label,
+                                                keyData.value,
+                                              ),
+                                          onLongPress: keyData.label == '⌫'
+                                              ? _controller
+                                                    .handleBackspaceLongPress
+                                              : null,
                                         ),
-                                        textColor: _getTextColor(
-                                          keyData.label,
-                                          colorScheme,
-                                        ),
-                                        fontSize: _getFontSize(keyData.label),
-                                        fontWeight: _getFontWeight(
-                                          keyData.label,
-                                        ),
-                                        onTap: () =>
-                                            _controller.handleButtonTap(
-                                              keyData.label,
-                                              keyData.value,
-                                            ),
-                                        onLongPress: keyData.label == '⌫'
-                                            ? _controller
-                                                  .handleBackspaceLongPress
-                                            : null,
                                       ),
                                     ),
                                   ),
@@ -347,7 +375,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                     : -(panelWidth +
                                           CalculatorConstants.gridPadding * 2),
                                 width: panelWidth,
-                                child: HistoryPanel(controller: _controller),
+                                child: RepaintBoundary(
+                                  child: HistoryPanel(controller: _controller),
+                                ),
                               ),
                             ],
                           ),
