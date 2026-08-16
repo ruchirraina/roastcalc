@@ -7,8 +7,8 @@ export default async function handler(req, res) {
 
     const ip = req.headers['x-forwarded-for'] || 'unknown';
     const now = Date.now();
-    const timeWindow = 300000; // 5 minutes
-    const limit = 5;
+    const timeWindow = 120000; // 2 minutes
+    const limit = 3;
 
     const requestData = ipTracker.get(ip) || { count: 0, startTime: now };
 
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     let systemPrompt = '';
     if (action === 'chips') {
         if (historyText === 'empty') {
-            systemPrompt = `You are a chill coworker inside this calculator app. Suggest 3 catchy math concepts, tricks, or shortcuts covering the calculator's basic operations.
+            systemPrompt = `Suggest 3 math concepts, tricks, or shortcuts covering the calculator's basic operations. Keep the tone plain, direct, and straightforward.
 
 Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
@@ -48,7 +48,7 @@ What NOT to do:
 * Do not suggest topics outside the supported operations (no calculus, trigonometry, logarithms, imaginary numbers, or advanced proofs).
 * Do not output Markdown code blocks (no \`\`\`json), greetings, or extra text.`;
         } else {
-            systemPrompt = `You are a chill coworker inside this calculator app. Suggest 3 catchy math concepts, tricks, or shortcuts based on the user's calculation history—focusing on the specific operations, patterns, or numbers they used. Every calculation in their history is already accurate.
+            systemPrompt = `Suggest 3 math concepts, tricks, or shortcuts based on the user's calculation history—focusing on the specific operations, patterns, or numbers they used. Every calculation in their history is already accurate. Keep the tone plain, direct, and straightforward.
 
 Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
@@ -64,7 +64,7 @@ What NOT to do:
 * Do not output Markdown code blocks or conversational text.`;
         }
     } else if (action === 'explain') {
-        systemPrompt = `You are a chill coworker inside this calculator app explaining this math concept or shortcut: "${topic}". Deliver the explanation with a light roast tone—playfully calling out why people overcomplicate it or rely too much on a calculator, while clearly breaking down how the math works.
+        systemPrompt = `Explain this math concept or shortcut: "${topic}". Deliver the explanation using plain, clear, and direct English. Be straightforward and educational.
 
 Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
@@ -75,13 +75,13 @@ Structure your response using clean Markdown:
 * Include a brief worked example showing the concept or trick in action.
 
 What NOT to do:
+* Do not use weird personas, jokes, or over-the-top language. Just explain the concept simply.
 * Do not question or critique the mathematical accuracy of their calculation history.
 * Do not drift into operations or math concepts outside the supported operations.
 * Do not change or rephrase the title on the first line; it must match "${topic}" word-for-word.
 * Do not use LaTeX syntax (no $, $$, \\frac, or backslashes). Use clean Unicode math symbols (+, -, ×, ÷, %, ^, ², ³, √, ³√, !).
 * Do not use tables, code blocks, or any ASCII/HTML/CSS diagrams.
-* Do not write conversational setup lines (no "Hey there!", "Here's a breakdown:", or "Hope this helps!").
-* Do not sound like an academic lecturer or an AI assistant.`;
+* Do not write conversational setup lines (no "Hey there!", "Here's a breakdown:", or "Hope this helps!").`;
     } else {
         return res.status(400).json({ error: 'Invalid action' });
     }

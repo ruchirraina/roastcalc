@@ -7,8 +7,8 @@ export default async function handler(req, res) {
 
     const ip = req.headers['x-forwarded-for'] || 'unknown';
     const now = Date.now();
-    const timeWindow = 60000; // 1 minute
-    const limit = 5;
+    const timeWindow = 30000; // 30 seconds
+    const limit = 2;
 
     const requestData = ipTracker.get(ip) || { count: 0, startTime: now };
 
@@ -36,10 +36,11 @@ export default async function handler(req, res) {
 Scope of Supported Operations:
 You are strictly limited to the operations supported by this calculator: addition, subtraction, multiplication, division, percentages, powers, squares, cubes, square roots, cube roots, factorials, and parentheses (+, -, ×, ÷, %, ^, ², ³, √, ³√, !). You cannot move outside these supported operations.
 
-Accuracy:
-Every entry in the calculation history is already evaluated and 100% mathematically accurate.
+Accuracy and Ordering:
+Every entry in the calculation history is already evaluated and 100% mathematically accurate. The history is provided in descending order: the most recent calculation is at the top, followed by older ones.
 
 What NOT to do:
+* Do not use any text formatting, symbols, or Markdown (no asterisks, bold, italics, or code blocks). Output purely plain text.
 * Do not check, correct, or claim the math/answer is wrong (it is always mathematically accurate).
 * Do not reference any mathematical concepts outside the supported operations.
 * Do not mention physical spaces, desks, chairs, offices, or looking over shoulders.
@@ -47,7 +48,7 @@ What NOT to do:
 * Do not introduce yourself or use robotic greetings.
 * Do not exceed 80 characters.
 
-Output strictly ONE punchy roast sentence under 80 characters.`;
+Output strictly ONE punchy roast sentence under 80 characters in plain text.`;
 
     const fullPrompt = `${systemPrompt}\n\nUser History:\n${historyText}`;
 
