@@ -12,8 +12,8 @@ class CalculatorLayout {
       isExpandedOnly: true,
     ),
     CalculatorKey(
-      label: '³√x',
-      value: '³√',
+      label: '∛x', // Changed to single character
+      value: '∛', // Changed to single character
       col: 3,
       row: 0,
       isExpandedOnly: true,

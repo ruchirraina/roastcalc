@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/pages/calculator_page.dart';
 
 void main() {
-  runApp(const RoastCalcApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((
+    _,
+  ) {
+    runApp(const RoastCalcApp());
+  });
 }
 
 class RoastCalcApp extends StatelessWidget {

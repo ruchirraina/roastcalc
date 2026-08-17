@@ -36,14 +36,15 @@ class CalculatorService {
         (match) => ')*(',
       );
 
+      // Uses the clean ∛ Unicode character
       processed = processed.replaceAllMapped(
-        RegExp(r'(³?√)(\d+(\.\d+)?)'),
+        RegExp(r'(∛|√)(\d+(\.\d+)?)'),
         (match) => '${match[1]}(${match[2]})',
       );
 
       processed = processed.replaceAll('×', '*');
       processed = processed.replaceAll('÷', '/');
-      processed = processed.replaceAll('³√', 'cbrt');
+      processed = processed.replaceAll('∛', 'cbrt');
       processed = processed.replaceAll('√', 'sqrt');
       processed = processed.replaceAll('²', '^2');
       processed = processed.replaceAll('³', '^3');
@@ -59,10 +60,13 @@ class CalculatorService {
         (match) => '((${match[1]}) ^ 0.5)',
       );
 
-      processed = processed.replaceAllMapped(
-        RegExp(r'cbrt\(([^)]+)\)'),
-        (match) => '((${match[1]}) ^ (1 / 3))',
-      );
+      // Loop to safely resolve nested cube roots (e.g. ∛∛27) inside out
+      for (int i = 0; i < 3; i++) {
+        processed = processed.replaceAllMapped(
+          RegExp(r'cbrt\(([^)]+)\)'),
+          (match) => '((${match[1]}) ^ (1 / 3))',
+        );
+      }
 
       final GrammarParser parser = GrammarParser();
       final Expression parsedExpression = parser.parse(processed);

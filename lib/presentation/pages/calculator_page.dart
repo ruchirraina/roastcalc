@@ -61,7 +61,7 @@ class _CalculatorPageState extends State<CalculatorPage>
         '!' ||
         '^' ||
         '√x' ||
-        '³√x' ||
+        '∛x' ||
         '(' ||
         ')' ||
         'x²' ||
@@ -80,7 +80,7 @@ class _CalculatorPageState extends State<CalculatorPage>
     '!' ||
     '^' ||
     '√x' ||
-    '³√x' ||
+    '∛x' ||
     '(' ||
     ')' ||
     'x²' ||
@@ -94,14 +94,15 @@ class _CalculatorPageState extends State<CalculatorPage>
     '÷' || '×' || '-' || '+' || '=' => CalculatorConstants.fontLarge,
     '^' => CalculatorConstants.fontMediumLarge,
     '(' || ')' => CalculatorConstants.fontMediumSmall,
-    'x²' || 'x³' || '√x' || '³√x' => CalculatorConstants.fontTiny,
+    'x²' || 'x³' || '√x' || '∛x' => CalculatorConstants.fontTiny,
     'AC' || '⌫' => CalculatorConstants.fontSmall,
     'EXP' => CalculatorConstants.fontSmaller,
     _ => CalculatorConstants.fontMedium,
   };
 
   FontWeight _getFontWeight(String label) => switch (label) {
-    'x²' || 'x³' || '√x' || '³√x' || 'AC' || '⌫' => FontWeight.bold,
+    'x²' || 'x³' || '√x' || '∛x' || 'AC' || '⌫' => FontWeight.bold,
+    '(' || ')' || '!' || '%' => FontWeight.w500,
     _ => FontWeight.normal,
   };
 
